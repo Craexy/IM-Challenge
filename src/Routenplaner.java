@@ -6,7 +6,8 @@ import org.graphstream.graph.Node;
 
 public class Routenplaner {
 	
-	private String[] Route;
+	private String Route;
+	private Graph g1 = new DefaultGraph("Fahrtzeiten");
 
 	public Routenplaner(){
 		erzeugeDaten();
@@ -15,7 +16,7 @@ public class Routenplaner {
 	
 	private void erzeugeDaten() {
 		
-		Graph g1 = new DefaultGraph("Fahrtzeiten");
+		
 		
 		Node A = g1.addNode("A");
 		Node B = g1.addNode("B");
@@ -96,13 +97,17 @@ public class Routenplaner {
 		
 	}
 
-	public String[] getRoute(){
+	public String getRoute(){
 		return Route;
 	}
 
 	
 	private void planeRoute() {
 
+	}
+	
+	public int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
+		return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit");
 	}
 	
 }
