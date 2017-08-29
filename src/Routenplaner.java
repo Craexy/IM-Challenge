@@ -109,5 +109,5 @@ public class Routenplaner {
 	public int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
 		return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit");
 	}
-	
+ //Heyho	
 }
