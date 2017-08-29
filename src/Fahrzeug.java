@@ -5,7 +5,8 @@ public class Fahrzeug {
 	private int Med120 = 0;
 	private int Med250 = 0;
 	private int Med500 = 0;
-	private String Strecke = "";
+	private String Tour = "";
+	private int Startzeit = 0;
 	
 	public Fahrzeug(int Medikament60, int Medikament120, int Medikament250, int Medikament500) {
 		Med60 = Medikament60;
@@ -19,7 +20,7 @@ public class Fahrzeug {
 		Med120 = Medikament120;
 		Med250 = Medikament250;
 		Med500 = Medikament500;
-		this.Strecke = Strecke;
+		this.Tour = Strecke;
 	}
 	
 	public Fahrzeug() {
@@ -27,11 +28,11 @@ public class Fahrzeug {
 	}
 	
 	public String getStrecke(){
-		return Strecke;
+		return Tour;
 	}
 	
 	public void setStrecke(String Strecke) {
-		this.Strecke = Strecke;
+		this.Tour = Strecke;
 	}
 	
 	public int get60() {
