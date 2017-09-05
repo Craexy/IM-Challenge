@@ -31,6 +31,7 @@ public class Tour {
         }
         // Tour zufällig anordnen
         Collections.shuffle(tour);
+        System.out.println(tour);
     }
     
 
