@@ -1,4 +1,3 @@
-import java.sql.Time;
 
 public class Fahrzeug {
 	
@@ -7,7 +6,8 @@ public class Fahrzeug {
 	private int Med250 = 0;
 	private int Med500 = 0;
 	private String Tour = "";
-	private Time Startzeit = new Time(0,0,0);
+	private Time startzeitFahrt = new Time(0,0,0);
+	private Time startzeitBeladung = new Time(0,0,0);
 	
 	public Fahrzeug(int Medikament60, int Medikament120, int Medikament250, int Medikament500) {
 		Med60 = Medikament60;
@@ -36,12 +36,20 @@ public class Fahrzeug {
 		this.Tour = Strecke;
 	}
 	
-	public void setStartzeit(Time Startzeit) {
-		this.Startzeit = Startzeit;
+	public void setStartzeitFahrt(Time Startzeit) {
+		this.startzeitFahrt = Startzeit;
 	}
 	
-	public Time getStartzeit() {
-		return Startzeit;
+	public Time getStartzeitFahrt() {
+		return startzeitFahrt;
+	}
+	
+	public void setStartzeitBeladung(Time Startzeit) {
+		this.startzeitBeladung = Startzeit;
+	}
+	
+	public Time getStartzeitBeladung() {
+		return startzeitBeladung;
 	}
 	
 	public int get60() {
