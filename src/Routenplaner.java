@@ -1,4 +1,9 @@
 import org.graphstream.graph.implementations.*;
+
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -7,8 +12,10 @@ import org.graphstream.graph.Node;
 public class Routenplaner {
 	
 
-	private String Route = "A,B,C,D,E,F,G,H";
+	private String route = "A,B,C,D,E,F,G,H";
 	private static Graph g1 = new DefaultGraph("Fahrtzeiten");
+	private ArrayList best = new ArrayList<String>();
+	private int tourLaenge;
 	
 
 	public Routenplaner(){
@@ -16,25 +23,127 @@ public class Routenplaner {
 		planeRoute();
 	}
 	
-	private void erzeugeDaten() {
+
+	public String getRoute(){
+		transformTourToString();
+		return route;
+	}
+	
+	public void transformTourToString(){
+		route = "";
+		for (int i = 0; i < best.size(); i++) {
+			if(i==best.size()-1){
+				route += best.get(i);
+			}else{
+				route += best.get(i)+",";
+			}
+      
+        }
+		System.out.println(route);
+	}
+
+	
+	private void planeRoute() {
+		simmulatedAnnealing();
+		System.out.println(tourLaenge);
+	}
+	
+	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
+		try{
+			return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit",Integer.class);
+		}catch (NullPointerException e)
+		{
+			return g1.getEdge(Endpunkt+Anfangspunkt).getAttribute("Fahrtzeit",Integer.class);
+		}
+	}
+
+
+	public static int getNumberOfNodes(){
+		return g1.getNodeCount();
+	}
+	 
+	public static String getCity(int cityIndex){
+		return g1.getNode(cityIndex).getId();
+		
+	}
+	
+	
+	public void simmulatedAnnealing(){
+		// Set initial temp
+        double temp = 10000;
+
+        // Cooling rate
+        double coolingRate = 0.003;
+        
+     // Initialize intial solution
+        Tour currentSolution = new Tour();
+        currentSolution.eineTourErstellen();
+        
+     // Set as current best
+        Tour best = new Tour(currentSolution.getTour());
+        
+     // Loop until system has cooled
+        while (temp > 1) {
+            // Create new neighbour tour
+            Tour newSolution = new Tour(currentSolution.getTour());
+
+            // Get a random positions in the tour
+            int tourPos1 = (int) (newSolution.tourSize() * Math.random());
+            int tourPos2 = (int) (newSolution.tourSize() * Math.random());
+
+            // Get the cities at selected positions in the tour
+            String citySwap1 = newSolution.getCity(tourPos1);
+            String citySwap2 = newSolution.getCity(tourPos2);
+
+            // Swap them
+            newSolution.setCity(tourPos2, citySwap1);
+            newSolution.setCity(tourPos1, citySwap2);
+            
+            // Get energy of solutions
+            int currentEnergy = currentSolution.getDistance();
+            int neighbourEnergy = newSolution.getDistance();
+
+            // Decide if we should accept the neighbour
+            if (acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) {
+                currentSolution = new Tour(newSolution.getTour());
+            }
+
+            // Keep track of the best solution found
+            if (currentSolution.getDistance() < best.getDistance()) {
+                best = new Tour(currentSolution.getTour());
+            }
+            
+            // Cool system
+            temp *= 1-coolingRate;
+        }
+        this.best = best.getTour();
+        tourLaenge = best.getDistance();
+	}
+	
+
+	 // Berechne die acceptance probability
+    public static double acceptanceProbability(int energy, int newEnergy, double temperature) {
+        // If the new solution is better, accept it (Energy = Gesamtdistanz der Route)
+        if (newEnergy < energy) {
+            return 1.0;
+        }
+        // If the new solution is worse, calculate an acceptance probability
+        return Math.exp((energy - newEnergy) / temperature);
+    }
+    
+    
+    
+private void erzeugeDaten() {
 		
 		
-		Node A = g1.addNode("A");
-		A.addAttribute("Name", "A");
+		Node A = g1.addNode("A");		
 		Node B = g1.addNode("B");
-		A.addAttribute("Name", "B");
 		Node C = g1.addNode("C");
-		A.addAttribute("Name", "C");
 		Node D = g1.addNode("D");
-		A.addAttribute("Name", "D");
 		Node E = g1.addNode("E");
-		A.addAttribute("Name", "E");
 		Node F = g1.addNode("F");
-		A.addAttribute("Name", "F");
 		Node G = g1.addNode("G");
-		A.addAttribute("Name", "G");
 		Node H = g1.addNode("H");
-		A.addAttribute("Name", "H");
 		
 		
 		Edge AB = g1.addEdge("AB", A, B);
@@ -101,33 +210,13 @@ public class Routenplaner {
 
 		Edge GH = g1.addEdge("GH", G, H);
 			GH.addAttribute("Fahrtzeit", 45);
-				
-		g1.display();
+			
+			
+		
+		
+		//g1.display();
 		
 
-	}
-
-	public String getRoute(){
-		return Route;
-	}
-
-	
-	private void planeRoute() {
-
-	}
-	
-	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
-		return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit");
-	}
-
-
-	public static int getNumberOfNodes(){
-		return g1.getNodeCount();
-	}
-	 
-	public static String getCity(int cityIndex){
-		return g1.getNode(cityIndex).getAttribute("Name");
-		
 	}
 
 	
