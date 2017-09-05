@@ -6,13 +6,10 @@ import org.graphstream.graph.Node;
 
 public class Routenplaner {
 	
-<<<<<<< HEAD
+
 	private String Route = "A,B,C,D,E,F,G,H";
-	private Graph g1 = new DefaultGraph("Fahrtzeiten");
-=======
-	private String Route;
 	private static Graph g1 = new DefaultGraph("Fahrtzeiten");
->>>>>>> branch 'master' of https://github.com/Craexy/IM-Challenge.git
+	
 
 	public Routenplaner(){
 		erzeugeDaten();
@@ -122,8 +119,7 @@ public class Routenplaner {
 	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
 		return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit");
 	}
-<<<<<<< HEAD
-=======
+
 
 	public static int getNumberOfNodes(){
 		return g1.getNodeCount();
@@ -135,5 +131,4 @@ public class Routenplaner {
 	}
 
 	
->>>>>>> branch 'master' of https://github.com/Craexy/IM-Challenge.git
 }
