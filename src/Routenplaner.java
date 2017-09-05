@@ -6,8 +6,13 @@ import org.graphstream.graph.Node;
 
 public class Routenplaner {
 	
+<<<<<<< HEAD
 	private String Route = "A,B,C,D,E,F,G,H";
 	private Graph g1 = new DefaultGraph("Fahrtzeiten");
+=======
+	private String Route;
+	private static Graph g1 = new DefaultGraph("Fahrtzeiten");
+>>>>>>> branch 'master' of https://github.com/Craexy/IM-Challenge.git
 
 	public Routenplaner(){
 		erzeugeDaten();
@@ -17,15 +22,23 @@ public class Routenplaner {
 	private void erzeugeDaten() {
 		
 		
-		
 		Node A = g1.addNode("A");
+		A.addAttribute("Name", "A");
 		Node B = g1.addNode("B");
+		A.addAttribute("Name", "B");
 		Node C = g1.addNode("C");
+		A.addAttribute("Name", "C");
 		Node D = g1.addNode("D");
+		A.addAttribute("Name", "D");
 		Node E = g1.addNode("E");
+		A.addAttribute("Name", "E");
 		Node F = g1.addNode("F");
+		A.addAttribute("Name", "F");
 		Node G = g1.addNode("G");
+		A.addAttribute("Name", "G");
 		Node H = g1.addNode("H");
+		A.addAttribute("Name", "H");
+		
 		
 		Edge AB = g1.addEdge("AB", A, B);
 			AB.addAttribute("Fahrtzeit", 27);
@@ -94,7 +107,7 @@ public class Routenplaner {
 				
 		g1.display();
 		
-		
+
 	}
 
 	public String getRoute(){
@@ -106,7 +119,21 @@ public class Routenplaner {
 
 	}
 	
-	public int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
+	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
 		return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit");
 	}
+<<<<<<< HEAD
+=======
+
+	public static int getNumberOfNodes(){
+		return g1.getNodeCount();
+	}
+	 
+	public static String getCity(int cityIndex){
+		return g1.getNode(cityIndex).getAttribute("Name");
+		
+	}
+
+	
+>>>>>>> branch 'master' of https://github.com/Craexy/IM-Challenge.git
 }
