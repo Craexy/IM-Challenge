@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 
 
 
 public class Tour {
 
-	private ArrayList tour = new ArrayList<String>();
+	private LinkedList tour = new LinkedList<String>();
 	private int distance = 0;
 	
 	
@@ -15,12 +16,12 @@ public class Tour {
         }
     }
     
-    public Tour(ArrayList tour){
-        this.tour = (ArrayList) tour.clone();
+    public Tour(LinkedList tour){
+        this.tour = (LinkedList) tour.clone();
     }
     
  
-    public ArrayList getTour(){
+    public LinkedList getTour(){
         return tour;
     }
     
@@ -30,8 +31,10 @@ public class Tour {
           setCity(cityIndex, Routenplaner.getCity(cityIndex));
         }
         // Tour zufällig anordnen
+        String firstElement = (String) tour.getFirst();  
+        tour.removeFirst();
         Collections.shuffle(tour);
-        System.out.println(tour);
+        tour.addFirst(firstElement);
     }
     
 

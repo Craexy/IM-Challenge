@@ -3,6 +3,7 @@ import org.graphstream.graph.implementations.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
@@ -12,9 +13,9 @@ import org.graphstream.graph.Node;
 public class Routenplaner {
 	
 
-	private String route = "A,B,C,D,E,F,G,H";
+	private String route;
 	private static Graph g1 = new DefaultGraph("Fahrtzeiten");
-	private ArrayList best = new ArrayList<String>();
+	private LinkedList best = new LinkedList<String>();
 	private int tourLaenge;
 	
 
@@ -25,11 +26,11 @@ public class Routenplaner {
 	
 
 	public String getRoute(){
-		transformTourToString();
+		transformRouteToString();
 		return route;
 	}
 	
-	public void transformTourToString(){
+	public void transformRouteToString(){
 		route = "";
 		for (int i = 0; i < best.size(); i++) {
 			if(i==best.size()-1){
@@ -39,13 +40,13 @@ public class Routenplaner {
 			}
       
         }
-		System.out.println(route);
 	}
 
 	
 	private void planeRoute() {
 		simmulatedAnnealing();
 		System.out.println(tourLaenge);
+		System.out.println(this.best);
 	}
 	
 	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
@@ -88,8 +89,8 @@ public class Routenplaner {
             Tour newSolution = new Tour(currentSolution.getTour());
 
             // Get a random positions in the tour
-            int tourPos1 = (int) (newSolution.tourSize() * Math.random());
-            int tourPos2 = (int) (newSolution.tourSize() * Math.random());
+            int tourPos1 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
+            int tourPos2 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
 
             // Get the cities at selected positions in the tour
             String citySwap1 = newSolution.getCity(tourPos1);
