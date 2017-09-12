@@ -36,7 +36,7 @@ public class Time {
 		else if (Zeit.getStunden()>this.stunden) return true;
 		
 		if (Zeit.getMinuten()<this.minuten) return false;
-		else if (Zeit.getMinuten()>this.minuten) return false;
+		else if (Zeit.getMinuten()>this.minuten) return true;
 		
 		return false;
 	}
