@@ -1,5 +1,5 @@
 
-public class Time {
+public class Time implements Comparable<Time>{
 	
 	private int stunden;
 	private int minuten;
@@ -11,11 +11,16 @@ public class Time {
 		sekunden = Sekunden;
 	}
 	
-	public Time reduceTime(int Minuten) {
-		if (minuten>=Minuten) minuten = minuten - Minuten; 
+	public Time reduceTime(int Minuten) throws IllegalArgumentException{
+		if (Minuten<0) throw new IllegalArgumentException();
+		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
 		else {
-			stunden = stunden - Minuten/60;
-			minuten = minuten - Minuten%60;
+			this.stunden = this.stunden - Minuten/60 - 1;
+			this.minuten = this.minuten + 60 - Minuten%60;
+			if (this.minuten==60) {
+				minuten = 0;
+				stunden = stunden + 1;
+			}
 		}
 		return new Time(stunden, minuten, sekunden);
 	}
@@ -41,11 +46,32 @@ public class Time {
 		return false;
 	}
 	
+	public boolean isLaterThan(Time Zeit) {
+		if (Zeit.getStunden()<this.stunden) return true;
+		else if(Zeit.getStunden()>this.stunden) return false;
+		
+		if (Zeit.getMinuten()<this.minuten) return true;
+		else if(Zeit.getMinuten()>this.minuten) return false;
+		
+		return false;
+	}
+	
 	public int getStunden() {
 		return stunden;
 	}
 
 	public int getMinuten() {
 		return minuten;
+	}
+	
+	public String toString() {
+		return ""+this.stunden+":"+this.minuten+":"+this.sekunden;
+	}
+
+	@Override
+	public int compareTo(Time Zeit) {
+		if (this.isLaterThan(Zeit)) return 1;
+		if (this.isEarlierThan(Zeit)) return -1;
+		return 0;
 	}
 }

@@ -7,7 +7,10 @@ public class Fahrzeug {
 	private int Med500 = 0;
 	private String Tour = "";
 	private Time startzeitFahrt = new Time(0,0,0);
-	private Time startzeitBeladung = new Time(0,0,0);
+	private Time startzeitBeladung60 = new Time(0,0,0);
+	private Time startzeitBeladung120 = new Time(0,0,0);
+	private Time startzeitBeladung250 = new Time(0,0,0);
+	private Time startzeitBeladung500 = new Time(0,0,0);
 	
 	public Fahrzeug(int Medikament60, int Medikament120, int Medikament250, int Medikament500) {
 		Med60 = Medikament60;
@@ -37,20 +40,46 @@ public class Fahrzeug {
 	}
 	
 	public void setStartzeitFahrt(Time Startzeit) {
-		this.startzeitFahrt = Startzeit;
+		this.startzeitFahrt = new Time(Startzeit.getStunden(), Startzeit.getMinuten(), 0);
 	}
 	
 	public Time getStartzeitFahrt() {
-		return startzeitFahrt;
+		return new Time (startzeitFahrt.getStunden(), startzeitFahrt.getMinuten(), 0);
 	}
 	
-	public void setStartzeitBeladung(Time Startzeit) {
-		this.startzeitBeladung = Startzeit;
+	public void setStartzeitBeladung60(Time Startzeit) {
+		this.startzeitBeladung60 = new Time(Startzeit.getStunden(), Startzeit.getMinuten(), 0);
 	}
 	
-	public Time getStartzeitBeladung() {
-		return startzeitBeladung;
+	public Time getStartzeitBeladung60() {
+		return new Time (startzeitBeladung60.getStunden(), startzeitBeladung60.getMinuten(), 0);
 	}
+	
+	public void setStartzeitBeladung120(Time Startzeit) {
+		this.startzeitBeladung120 = new Time(Startzeit.getStunden(), Startzeit.getMinuten(), 0);
+	}
+	
+	public Time getStartzeitBeladung120() {
+		return new Time (startzeitBeladung120.getStunden(), startzeitBeladung120.getMinuten(), 0);
+	}
+	
+	public void setStartzeitBeladung250(Time Startzeit) {
+		this.startzeitBeladung250 = new Time(Startzeit.getStunden(), Startzeit.getMinuten(), 0);
+	}
+	
+	public Time getStartzeitBeladung250() {
+		return new Time (startzeitBeladung250.getStunden(), startzeitBeladung250.getMinuten(), 0);
+	}
+	
+	public void setStartzeitBeladung500(Time Startzeit) {
+		this.startzeitBeladung500 = new Time(Startzeit.getStunden(), Startzeit.getMinuten(), 0);
+	}
+	
+	public Time getStartzeitBeladung500() {
+		return new Time (startzeitBeladung500.getStunden(), startzeitBeladung500.getMinuten(), 0);
+	}
+	
+	
 	
 	public int get60() {
 		return Med60;
@@ -60,7 +89,7 @@ public class Fahrzeug {
 		this.Med60=Med60;
 	}
 	
-	public int getMed120() {
+	public int get120() {
 		return Med120;
 	}
 	
@@ -68,7 +97,7 @@ public class Fahrzeug {
 		this.Med120=Med120;
 	}
 	
-	public int getMed250(){
+	public int get250(){
 		return Med250;
 	}
 	
@@ -76,7 +105,7 @@ public class Fahrzeug {
 		this.Med250=Med250;
 	}
 	
-	public int getMed500(){
+	public int get500(){
 		return Med500;
 	}
 	

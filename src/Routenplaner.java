@@ -50,6 +50,7 @@ public class Routenplaner {
 	}
 	
 	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {
+		if (Anfangspunkt.equals(Endpunkt)) return 0;
 		try{
 			return g1.getEdge(Anfangspunkt+Endpunkt).getAttribute("Fahrtzeit",Integer.class);
 		}catch (NullPointerException e)
