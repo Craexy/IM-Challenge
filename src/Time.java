@@ -3,20 +3,20 @@ public class Time implements Comparable<Time>{
 	
 	private int stunden;
 	private int minuten;
-	private int sekunden;
+	private int tage;
 	
-	public Time(int Stunden, int Minuten, int Sekunden) {
+	public Time(int Stunden, int Minuten, int Tage) {
 		stunden = Stunden;
 		minuten = Minuten;
-		sekunden = Sekunden;
+		tage = Tage;
 	}
 	
 	public Time getNewInstance() {
-		return new Time(stunden, minuten, sekunden);
+		return new Time(stunden, minuten, tage);
 	}
 	
 	public Time reduceTime(int Minuten) throws IllegalArgumentException{
-		if (Minuten<0) throw new IllegalArgumentException();
+		/*if (Minuten<0) throw new IllegalArgumentException();
 		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
 		else {
 			if (Minuten%60==0){ this.stunden = this.stunden-Minuten/60;
@@ -29,7 +29,27 @@ public class Time implements Comparable<Time>{
 				stunden = stunden + 1;
 			}
 		}
-		return new Time(stunden, minuten, sekunden);
+		//falls Zeit am Vortag liegt --> nur für ein Tag früher möglich
+		if (this.stunden<0) {
+			tage = tage-1;
+			stunden = 24 + stunden;
+		}
+		return new Time(stunden, minuten, tage);*/
+		if (Minuten<0) throw new IllegalArgumentException();
+		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
+		else {
+			int tempStunden = Minuten/60;
+			this.stunden = this.stunden - tempStunden;
+			int tempMinuten = Minuten-60*tempStunden;
+			if (tempMinuten<=this.minuten) this.minuten = this.minuten - tempMinuten;
+			else this.minuten = 60 - (tempMinuten-this.minuten);
+		}
+		//falls Zeit am Vortag liegt --> nur für ein Tag früher möglich
+				if (this.stunden<0) {
+					tage = tage+1;
+					stunden = 24 + stunden;
+				}
+		return new Time(this.stunden, this.minuten, this.tage);
 		}
 	
 	public Time addTime(int Minuten) {
@@ -44,6 +64,9 @@ public class Time implements Comparable<Time>{
 	}
 
 	public boolean isEarlierThan(Time Zeit) {
+		if(Zeit.getTage()<this.tage) return false;
+		else if(Zeit.getTage()>this.tage) return true;
+		
 		if (Zeit.getStunden()<this.stunden) return false;
 		else if (Zeit.getStunden()>this.stunden) return true;
 		
@@ -54,6 +77,9 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public boolean isLaterThan(Time Zeit) {
+		if (Zeit.getTage()<this.tage) return true;
+		else if(Zeit.getTage()>this.tage) return false;
+		
 		if (Zeit.getStunden()<this.stunden) return true;
 		else if(Zeit.getStunden()>this.stunden) return false;
 		
@@ -71,8 +97,13 @@ public class Time implements Comparable<Time>{
 		return minuten;
 	}
 	
+	public int getTage() {
+		return tage;
+	}
+	
 	public String toString() {
-		return ""+this.stunden+":"+this.minuten+":"+this.sekunden;
+		if (this.tage>0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage+" Tage vorher.";
+		else return ""+this.stunden+":"+this.minuten;
 	}
 
 	@Override
