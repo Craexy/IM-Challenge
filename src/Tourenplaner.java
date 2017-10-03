@@ -81,14 +81,14 @@ public class Tourenplaner {
 	    Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
 	    fahrzeuge.add(fahrzeug2);
 	    
-	    boolean bedarfGedeckt = false;
+	 /*   boolean bedarfGedeckt = false;
 	    do {
 	    	//welche Medikamente sind zu welchem Zeitpunkt noch übrig?
 	    	//ab wann/bis wann sind diese Medikamente nutzbar?
 	    	//wo sind (unter Einbezug der Fahrtzeit) 
 	    	//starte Fahrzeug mit diesem Medikament und
 	    } 
-	    while (!bedarfGedeckt);
+	    while (!bedarfGedeckt);*/
 	}
 	
 	private void befülleDaten() {

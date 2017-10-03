@@ -6,19 +6,21 @@ import java.util.StringTokenizer;
 
 public class Produktionsplaner {
 	
+	//int groeßeDerArrays = 4; unwichtig geworden?
+	
 	private LinkedList <Fahrzeug> fahrzeuge;
 	
-	private LinkedList<int[]> fahrzeugBedarfe;
-	private LinkedList <Time[]> bedarfszeitpunkte;
-	private LinkedList <Time[]> produktionsstartZeitpunkte;
+	private LinkedList <LinkedList<Integer>> fahrzeugBedarfe;
+	private LinkedList <LinkedList<Time>> bedarfszeitpunkte;
+	private LinkedList <LinkedList<Time>> produktionsstartZeitpunkte;
 	
 	
 	public Produktionsplaner(LinkedList<Fahrzeug> fahrzeuge){
 		this.fahrzeuge = fahrzeuge;	
 		
-		fahrzeugBedarfe = new LinkedList<int[]>();
-		bedarfszeitpunkte = new LinkedList<Time[]>();
-		produktionsstartZeitpunkte = new LinkedList<Time[]>();
+		fahrzeugBedarfe = new LinkedList<LinkedList<Integer>>();
+		bedarfszeitpunkte = new LinkedList<LinkedList<Time>>();
+		produktionsstartZeitpunkte = new LinkedList<LinkedList<Time>>();
 		
 		planeProduktion();
 		
@@ -26,55 +28,62 @@ public class Produktionsplaner {
 	
 	public void planeProduktion(){
 		getNecessaryParameters();
+		assignProductionLines();
 		
 		//Prüfe auf Konflikte der Bedarfe und der Produktionskapazitäten
 	    prüfeAufKonflikte();
 	}
 	
 	public void getNecessaryParameters(){
-		
-		//Initialisierung der Zwischenspeicher für die relevanten Produktionsparameter
-		 int[] bedarfe = new int[4];
-		 Time[]  produktionsende= new Time[4];
-		 Time[] produktionsstart = new Time[4];
-		 int[] produktionsdauer= new int[4];
+
+		LinkedList<Integer> produktionsdauer= new LinkedList<Integer>();
 		 
 		// Berechnung für alle Fahrzeuge
 		for(int i=0;i<fahrzeuge.size();i++){
 			
-			//Ein Fahrzeug wird betrachtet und alle die Produktion betreffenden Parameter werden berechnet
-			bedarfe[0] = fahrzeuge.get(i).get60();
-			bedarfe[1] = fahrzeuge.get(i).get120();
-			bedarfe[2] = fahrzeuge.get(i).get250();
-			bedarfe[3] = fahrzeuge.get(i).get500();
+			//Initialisierung der Zwischenspeicher für die relevanten Produktionsparameter
+			LinkedList<Integer> bedarfe = new LinkedList<Integer>();
+			LinkedList<Time>  produktionsende= new LinkedList<Time>();
+			LinkedList<Time> produktionsstart = new LinkedList<Time>();
 			
-			produktionsende[0] = fahrzeuge.get(i).getStartzeitBeladung60();
-			produktionsende[1] = fahrzeuge.get(i).getStartzeitBeladung120();
-			produktionsende[2] = fahrzeuge.get(i).getStartzeitBeladung250();
-			produktionsende[3] = fahrzeuge.get(i).getStartzeitBeladung500();
+			//Ein Fahrzeug wird betrachtet und alle die Produktion betreffenden Parameter werden berechnet
+			
+			bedarfe.add(fahrzeuge.get(i).get60());
+			bedarfe.add(fahrzeuge.get(i).get120());
+			bedarfe.add(fahrzeuge.get(i).get250());
+			bedarfe.add(fahrzeuge.get(i).get500());
+			
+			produktionsende.clear();
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung60());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung120());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung250());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung500());
 			
 			
 			//getProduktionsdauer und getStartzeitProduktion
-			int dauer60 = (int)Math.ceil((double)bedarfe[0]/150)*15;
-			int dauer120 = (int)Math.ceil((double)bedarfe[1]/150)*30;
-			int dauer250 = (int)Math.ceil((double)bedarfe[2]/150)*60;
-			int dauer500 = (int)Math.ceil((double)bedarfe[3]/150)*120;
+			int dauer60 = (int)Math.ceil((double)bedarfe.get(0)/150)*15;
+			int dauer120 = (int)Math.ceil((double)bedarfe.get(1)/150)*30;
+			int dauer250 = (int)Math.ceil((double)bedarfe.get(2)/150)*60;
+			int dauer500 = (int)Math.ceil((double)bedarfe.get(3)/150)*120;
 			
-			produktionsdauer[0] = dauer60;
-			produktionsdauer[1] = dauer120;
-			produktionsdauer[2] = dauer250;
-			produktionsdauer[3] = dauer500;
+			produktionsdauer.clear();
+			produktionsdauer.add(dauer60);
+			produktionsdauer.add(dauer120);
+			produktionsdauer.add(dauer250);
+			produktionsdauer.add(dauer500);
 			
 			
-			Time spMed60 = new Time(produktionsende[0].getStunden(), produktionsende[0].getMinuten(),0).reduceTime(produktionsdauer[0]);
-			Time spMed120 = new Time(produktionsende[1].getStunden(), produktionsende[1].getMinuten(),0).reduceTime(produktionsdauer[1]);
-			Time spMed250 = new Time(produktionsende[2].getStunden(), produktionsende[2].getMinuten(),0).reduceTime(produktionsdauer[2]);
-			Time spMed500 = new Time(produktionsende[3].getStunden(), produktionsende[3].getMinuten(),0).reduceTime(produktionsdauer[3]);
-		
-			produktionsstart[0] = spMed60;
-			produktionsstart[1] = spMed120;
-			produktionsstart[2] = spMed250;
-			produktionsstart[3] = spMed500;
+			Time spMed60 = produktionsende.get(0).getNewInstance().reduceTime(produktionsdauer.get(0));
+			Time spMed120 = produktionsende.get(1).getNewInstance().reduceTime(produktionsdauer.get(1));
+			Time spMed250 = produktionsende.get(2).getNewInstance().reduceTime(produktionsdauer.get(2));
+			Time spMed500 = produktionsende.get(3).getNewInstance().reduceTime(produktionsdauer.get(3));
+			
+			
+			produktionsstart.clear();
+			produktionsstart.add(spMed60);
+			produktionsstart.add(spMed120);
+			produktionsstart.add(spMed250);
+			produktionsstart.add(spMed500);
 			
 			
 			System.out.println("\n");
@@ -96,31 +105,6 @@ public class Produktionsplaner {
 			produktionsstartZeitpunkte.add(produktionsstart);
 			bedarfszeitpunkte.add(produktionsende);
 			
-			
-			//Testen der Datenstruktur; Auf diese Weise muss Zugriff auf Arrays in den LinkedLists erfolgen
-			int[] tester = fahrzeugBedarfe.getFirst();
-			System.out.println(tester[0]);
-			System.out.println(tester[1]);
-			System.out.println(tester[2]);
-			System.out.println(tester[3]);
-			
-			System.out.println("\n");
-
-			Time[] tester2 = produktionsstartZeitpunkte.getFirst();
-			System.out.println(tester2[0].toString());
-			System.out.println(tester2[1].toString());
-			System.out.println(tester2[2].toString());
-			System.out.println(tester2[3].toString());
-			
-			System.out.println("\n");
-			
-			Time[] tester3 = bedarfszeitpunkte.getFirst();
-			System.out.println(tester3[0].toString());
-			System.out.println(tester3[1].toString());
-			System.out.println(tester3[2].toString());
-			System.out.println(tester3[3].toString());
-			
-			System.out.println("\n");
 			
 		}
 		
@@ -147,6 +131,46 @@ public class Produktionsplaner {
 		//... Besser wenn in der Time Klasse eine Differenz funktion genutzt wird -> produktionsdauerGesamtList[i] - Differenz(startzeitpunkte[i],bedarfszeitpunkte[i]) | produktionsdauergesamt muss dann wahrscheinlich zu einem Array mit 4 mal dem gleichen Wert gemacht werden
 		//																																								  Ergebnis der Rechenoperation kann dann als int Auslastung[] gespeichert werden
 		//... Das Ergebnis der Rechnung sind Kapazitäten in denen Produktion für nächstes Fahrzeug möglich ist (In der Form speichern dass erkenntlich wird wieviel von den jeweiligen Medikamenten maximal produziert werden können)
+	}
+	
+	public void assignProductionLines(){
+		
+		/*LinkedList<Time> test = produktionsstartZeitpunkte.get(1);
+		LinkedList<Time> test2 = bedarfszeitpunkte.get(1);
+		
+	    System.out.println(test);	
+	    System.out.println(test2);	*/
+		//Daten in den äußeren LinkedLists stimmen
+		
+		Produktionslinie p1 =  new Produktionslinie(this);
+		Produktionslinie p2 =  new Produktionslinie(this);
+		Produktionslinie p3 =  new Produktionslinie(this);
+		Produktionslinie p4 =  new Produktionslinie(this);
+		
+		for(int k=0;k<fahrzeuge.size();k++){
+			
+			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
+			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
+			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
+			
+		    if(p1.assign(produktionsstart,produktionsende,bedarfe)){
+		    	System.out.println("Maschine P1 konnte belegt werden!");
+		    }
+			
+		}
+				
+	}
+	
+	public LinkedList<LinkedList<Integer>> getFahrzeugBedarfe() {
+		return fahrzeugBedarfe;
+	}
+	
+	public LinkedList <LinkedList<Time>> getProduktionsstartZeitpunkte() {
+		return produktionsstartZeitpunkte;
+	}
+	
+	public LinkedList <LinkedList<Time>> getBedarfszeitpunkte() {
+		return bedarfszeitpunkte;
 	}
 	
 }
