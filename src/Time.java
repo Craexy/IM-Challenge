@@ -11,6 +11,10 @@ public class Time implements Comparable<Time>{
 		sekunden = Sekunden;
 	}
 	
+	public Time getNewInstance() {
+		return new Time(stunden, minuten, sekunden);
+	}
+	
 	public Time reduceTime(int Minuten) throws IllegalArgumentException{
 		if (Minuten<0) throw new IllegalArgumentException();
 		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 

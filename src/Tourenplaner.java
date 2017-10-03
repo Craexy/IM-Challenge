@@ -37,19 +37,21 @@ public class Tourenplaner {
 	//Minuten nach Produktion, ab denen Medikament60 benutzt werden kann 
 	private int startNutzMed60 = 270;
 	//Minuten nach Produktion, bis zu denen Medikament60 benutzt werden kann 
-	private int endNutzMed60 = 450;
+	//minus 30, da die Medikamente 30 Minuten vor Benutzung vorliegen müssen
+	//--> es stehen also 30 Minuten weniger zur Entladung zur Verfügung
+	private int endNutzMed60 = 450-30;
 	private int dauerNutzMed60 = endNutzMed60-startNutzMed60;
 	
 	private int startNutzMed120 = 390;
-	private int endNutzMed120 = 600;
+	private int endNutzMed120 = 600-30;
 	private int dauerNutzMed120 = endNutzMed120 - startNutzMed120;
 
 	private int startNutzMed250 = 540;
-	private int endNutzMed250 = 720;
+	private int endNutzMed250 = 720-30;
 	private int dauerNutzMed250 = endNutzMed250 - startNutzMed250;
 
 	private int startNutzMed500 = 660;
-	private int endNutzMed500 = 840;
+	private int endNutzMed500 = 840-30;
 	private int dauerNutzMed500 = endNutzMed500 - startNutzMed500;
 	
 	public Tourenplaner() {
@@ -69,7 +71,24 @@ public class Tourenplaner {
 		
 		
 		this.befülleDaten();
-		this.berechneTouren();
+		Fahrzeug fahrzeug1  = this.neuesFahrzeugSchicken(routenplaner.getRoute());
+		fahrzeuge.add(fahrzeug1);
+		//umgekehrte Route
+		String strecke2 = "";
+	    for (int i=0; i<7; i++) {
+	    	strecke2 = strecke2+routenplaner.getRoute().split(",")[7-i]+",";
+	    	}
+	    Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
+	    fahrzeuge.add(fahrzeug2);
+	    
+	    boolean bedarfGedeckt = false;
+	    do {
+	    	//welche Medikamente sind zu welchem Zeitpunkt noch übrig?
+	    	//ab wann/bis wann sind diese Medikamente nutzbar?
+	    	//wo sind (unter Einbezug der Fahrtzeit) 
+	    	//starte Fahrzeug mit diesem Medikament und
+	    } 
+	    while (!bedarfGedeckt);
 	}
 	
 	private void befülleDaten() {
@@ -347,16 +366,189 @@ public class Tourenplaner {
 						System.out.println("Fahrzeug1 hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug1.get500()+" Einheiten von Med500 abgeliefert.");
 					}
     fahrzeuge.add(fahrzeug1);
-    
-    Fahrzeug fahrzeug2 = new Fahrzeug();
-    String strecke2 = "A,";
-    for (int i=0; i<7; i++) {
-    	strecke2 = strecke2+routenplaner.getRoute().split(",")[7-i]+",";
-    	}
-    fahrzeug2.setStrecke(strecke2);
-    
-    fahrzeuge.add(1, fahrzeug2);
 }
+	
+	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
+		Fahrzeug fahrzeug = new Fahrzeug();
+		System.out.println("Neues Fahrzeug startet");
+		fahrzeug.setStrecke(strecke);
+		String aktuellerStopp = "A";
+		Time ersterBedarf = bedarfe.get(strecke.split(",")[0]).getFirst().getNewInstance();
+	    Time zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(Routenplaner.getFahrtzeit("A", strecke.split(",")[0]));
+	    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance());
+	    fahrzeug.setStartzeitBeladung60(zeitpunktAktuell.getNewInstance().reduceTime(startNutzMed60));
+	    LinkedList<Time> aktuellerBedarf = new LinkedList<Time>();
+	    boolean deckbarerBedarfVorhanden;
+	    for (int i=0; i<strecke.split(",").length;i++) {
+			//Fahrt zu erstem Stopp
+				int naechsteFahrtzeit = Routenplaner.getFahrtzeit(aktuellerStopp, routenplaner.getRoute().split(",")[i]);
+				aktuellerStopp=fahrzeug.getStrecke().split(",")[i];
+				zeitpunktAktuell = zeitpunktAktuell.addTime(naechsteFahrtzeit);
+				aktuellerBedarf = (LinkedList<Time>) bedarfe.get(aktuellerStopp);
+			
+			//Solange Bedarf vorhanden ist, der durch das aktuelle Fahrzeug durch Med60 gedeckt werden kann 
+			//soll dies getan werden
+			//Geprüft ob Bedarf vorhanden ist, nachdem das Fahrzeug beim Standort ankommt UND bevor das Medikament abgelaufen ist
+				LinkedList<Time> frühBedarf = new LinkedList<Time>();
+				do {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
+				}
+				while (aktuellerBedarf.getFirst()
+						.isEarlierThan(fahrzeug.getStartzeitBeladung60().addTime(endNutzMed60)));
+				
+				deckbarerBedarfVorhanden=true;
+				do {
+					try {
+					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell.getNewInstance().reduceTime(1))) {	
+					fahrzeug.set60(fahrzeug.get60()+1);
+					frühBedarf.removeFirst();} 
+					else deckbarerBedarfVorhanden = false;}
+					catch (Exception e) {deckbarerBedarfVorhanden=false;}
+				} 
+				while (deckbarerBedarfVorhanden);
+				aktuellerBedarf.addAll(frühBedarf);
+				aktuellerBedarf.sort(null);
+				
+				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get60()+" Einheiten von Med60 abgeliefert.");
+			}
+	    
+	    LinkedList<Time> bedarfAnErstemStopp = new LinkedList<Time>();
+	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
+	    Time start120 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed120));
+		if (start120.isEarlierThan(fahrzeug.getStartzeitFahrt())) {
+		fahrzeug.setStartzeitBeladung120(start120);}
+		else fahrzeug.setStartzeitBeladung120(fahrzeug.getStartzeitFahrt());	    
+	    aktuellerStopp = "A";
+	    zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(Routenplaner.getFahrtzeit("A", strecke.split(",")[0]));
+	    for (int i=0; i<strecke.split(",").length;i++) {
+			//Fahrt zu erstem Stopp
+				int naechsteFahrtzeit = Routenplaner.getFahrtzeit(aktuellerStopp, routenplaner.getRoute().split(",")[i]);
+				aktuellerStopp=fahrzeug.getStrecke().split(",")[i];
+				zeitpunktAktuell = zeitpunktAktuell.addTime(naechsteFahrtzeit);
+				aktuellerBedarf = (LinkedList<Time>) bedarfe.get(aktuellerStopp);
+			
+			//Solange Bedarf vorhanden ist, der durch das aktuelle Fahrzeug durch Med120 gedeckt werden kann 
+			//soll dies getan werden
+			//Geprüft ob Bedarf vorhanden ist, nachdem das Fahrzeug beim Standort ankommt UND bevor das Medikament abgelaufen ist
+				LinkedList<Time> frühBedarf = new LinkedList<Time>();
+				do {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
+				}
+				while (aktuellerBedarf.getFirst()
+						.isEarlierThan(fahrzeug.getStartzeitBeladung120().addTime(endNutzMed120)));
+				
+				deckbarerBedarfVorhanden=true;
+				do {
+					try {
+					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
+					fahrzeug.set120(fahrzeug.get120()+1);
+					frühBedarf.removeFirst();} 
+					else deckbarerBedarfVorhanden = false;}
+					catch (Exception e) {deckbarerBedarfVorhanden=false;}
+				} 
+				while (deckbarerBedarfVorhanden);
+				aktuellerBedarf.addAll(frühBedarf);
+				aktuellerBedarf.sort(null);
+				
+				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
+			}
+	    bedarfAnErstemStopp = new LinkedList<Time>();
+	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
+	    Time start250 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed250));
+		if (start250.isEarlierThan(fahrzeug.getStartzeitFahrt())) {
+		fahrzeug.setStartzeitBeladung250(start250);}
+		else fahrzeug.setStartzeitBeladung250(fahrzeug.getStartzeitFahrt());
+	    aktuellerStopp = "A";
+	    zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(Routenplaner.getFahrtzeit("A", strecke.split(",")[0]));
+	    for (int i=0; i<strecke.split(",").length;i++) {
+			//Fahrt zu erstem Stopp
+				int naechsteFahrtzeit = Routenplaner.getFahrtzeit(aktuellerStopp, routenplaner.getRoute().split(",")[i]);
+				aktuellerStopp=fahrzeug.getStrecke().split(",")[i];
+				zeitpunktAktuell = zeitpunktAktuell.addTime(naechsteFahrtzeit);
+				aktuellerBedarf = (LinkedList<Time>) bedarfe.get(aktuellerStopp);
+			
+			//Solange Bedarf vorhanden ist, der durch das aktuelle Fahrzeug durch Med250 gedeckt werden kann 
+			//soll dies getan werden
+			//Geprüft ob Bedarf vorhanden ist, nachdem das Fahrzeug beim Standort ankommt UND bevor das Medikament abgelaufen ist
+				LinkedList<Time> frühBedarf = new LinkedList<Time>();
+				do {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
+				}
+				while (aktuellerBedarf.getFirst()
+						.isEarlierThan(fahrzeug.getStartzeitBeladung250().addTime(endNutzMed250)));
+				
+				deckbarerBedarfVorhanden=true;
+				do {
+					try {
+					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
+					fahrzeug.set250(fahrzeug.get250()+1);
+					frühBedarf.removeFirst();} 
+					else deckbarerBedarfVorhanden = false;}
+					catch (Exception e) {deckbarerBedarfVorhanden=false;}
+				} 
+				while (deckbarerBedarfVorhanden);
+				aktuellerBedarf.addAll(frühBedarf);
+				aktuellerBedarf.sort(null);
+				
+				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get250()+" Einheiten von Med250 abgeliefert.");
+			}
+	    
+	    bedarfAnErstemStopp = new LinkedList<Time>();
+	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
+	    Time start500 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed500));
+		if (start500.isEarlierThan(fahrzeug.getStartzeitFahrt())) {
+		fahrzeug.setStartzeitBeladung500(start500);}
+		else fahrzeug.setStartzeitBeladung500(fahrzeug.getStartzeitFahrt());
+	    aktuellerStopp = "A";
+	    zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(Routenplaner.getFahrtzeit("A", strecke.split(",")[0]));
+	    fahrzeug.setStartzeitBeladung500(zeitpunktAktuell.getNewInstance().reduceTime(startNutzMed500));
+	    for (int i=0; i<strecke.split(",").length;i++) {
+			//Fahrt zu erstem Stopp
+				int naechsteFahrtzeit = Routenplaner.getFahrtzeit(aktuellerStopp, routenplaner.getRoute().split(",")[i]);
+				aktuellerStopp=fahrzeug.getStrecke().split(",")[i];
+				zeitpunktAktuell = zeitpunktAktuell.addTime(naechsteFahrtzeit);
+				aktuellerBedarf = (LinkedList<Time>) bedarfe.get(aktuellerStopp);
+			
+			//Solange Bedarf vorhanden ist, der durch das aktuelle Fahrzeug durch Med500 gedeckt werden kann 
+			//soll dies getan werden
+			//Geprüft ob Bedarf vorhanden ist, nachdem das Fahrzeug beim Standort ankommt UND bevor das Medikament abgelaufen ist
+				LinkedList<Time> frühBedarf = new LinkedList<Time>();
+				deckbarerBedarfVorhanden = true;
+				do {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
+					try {if (!aktuellerBedarf.getFirst()
+					.isEarlierThan(fahrzeug.getStartzeitBeladung500().addTime(endNutzMed500))) {
+						deckbarerBedarfVorhanden=false;
+					}} catch (Exception e) {deckbarerBedarfVorhanden=false;}
+				}
+				while (deckbarerBedarfVorhanden);
+				
+				deckbarerBedarfVorhanden=true;
+				do {
+					try {
+					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
+					fahrzeug.set500(fahrzeug.get500()+1);
+					frühBedarf.removeFirst();} 
+					else deckbarerBedarfVorhanden = false;}
+					catch (Exception e) {deckbarerBedarfVorhanden=false;}
+				} 
+				while (deckbarerBedarfVorhanden);
+				aktuellerBedarf.addAll(frühBedarf);
+				aktuellerBedarf.sort(null);
+				
+				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
+			}
+	    
+		System.out.println("Bedarf A benötigt "+bedarfA.size()+" weitere Medikamente");
+		System.out.println("Bedarf B benötigt "+bedarfB.size()+" weitere Medikamente");
+		System.out.println("Bedarf C benötigt "+bedarfC.size()+" weitere Medikamente");
+		System.out.println("Bedarf D benötigt "+bedarfD.size()+" weitere Medikamente");
+		System.out.println("Bedarf E benötigt "+bedarfE.size()+" weitere Medikamente");
+		System.out.println("Bedarf F benötigt "+bedarfF.size()+" weitere Medikamente");
+		System.out.println("Bedarf G benötigt "+bedarfG.size()+" weitere Medikamente");
+		System.out.println("Bedarf H benötigt "+bedarfH.size()+" weitere Medikamente");
+		return fahrzeug;
+	}
 	
 	private double berechneVerblHaltbarkeit30(double Radioaktivität) {
 		return (0.85*Radioaktivität);
