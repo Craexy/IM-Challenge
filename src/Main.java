@@ -5,10 +5,10 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-	Tourenplaner tour = new Tourenplaner();
-	System.out.println(tour.getFahrzeuge().get(1).getStrecke());
-	//Routenplaner route = new Routenplaner();
-
+	Tourenplaner tourp = new Tourenplaner();
+	Produktionsplaner produktp = new Produktionsplaner(tourp.getFahrzeuge());
+	
+	//System.out.println(tourp.getFahrzeuge().get(1).getStrecke());
 	
 	}
 
