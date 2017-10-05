@@ -79,22 +79,19 @@ public class Tourenplaner {
 		entladezeiten.put("H", entladezeitH);
 		
 		//Daten mit Uhrzeiten der Bedarfe werden eingelesen
-		//this.befülleDaten();
+		this.befülleDaten();
 	    //Variante 1
-		//this.variante1();
-	    
-	 /*   boolean bedarfGedeckt = false;
+		this.variante1();
 
 		//Variante 2
-		this.befülleDaten();
-		this.variante2();
+		//this.befülleDaten();
+		//this.variante2();
 	   
 	    
 	    
 	    //Fahrzeuge fahren alternativ nur zur Hälfte und kehren dann um
 	    
 /*	    boolean bedarfGedeckt = false;
- 		branch 'master' of https://github.com/Craexy/IM-Challenge
 	    do {
 	    	//welche Medikamente sind zu welchem Zeitpunkt noch übrig?
 	    	//ab wann/bis wann sind diese Medikamente nutzbar?
@@ -415,6 +412,10 @@ public class Tourenplaner {
 		fahrzeuge.add(fahrzeug2);
 	}
 	
+	public void verteileReste() {
+		
+	}
+	
 	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
 		//Zeit zu der das Fahrzeug wieder zurück im Depot ist
 		Time endzeit = new Time(0,0,0);
@@ -447,8 +448,8 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
-						if (aktuellerBedarf.getFirst()
-								.isEarlierThan(fahrzeug.getStartzeitBeladung60().addTime(endNutzMed60)))
+						if (!aktuellerBedarf.getFirst()
+								.isEarlierThan(fahrzeug.getStartzeitBeladung60().getNewInstance().addTime(endNutzMed60)))
 							bedarfVorhanden=false;
 					} catch (Exception e) {
 						bedarfVorhanden = false;
@@ -500,8 +501,8 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
-						if (aktuellerBedarf.getFirst()
-								.isEarlierThan(fahrzeug.getStartzeitBeladung120().addTime(endNutzMed120))) bedarfVorhanden = false;
+						if (!aktuellerBedarf.getFirst()
+								.isEarlierThan(fahrzeug.getStartzeitBeladung120().getNewInstance().addTime(endNutzMed120))) bedarfVorhanden = false;
 					} catch (Exception e) {
 						bedarfVorhanden = false;
 					}
@@ -547,7 +548,7 @@ public class Tourenplaner {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
 					if (!aktuellerBedarf.getFirst()
-							.isEarlierThan(fahrzeug.getStartzeitBeladung250().addTime(endNutzMed250))) bedarfVorhanden = false;}
+							.isEarlierThan(fahrzeug.getStartzeitBeladung250().getNewInstance().addTime(endNutzMed250))) bedarfVorhanden = false;}
 					catch (Exception e) {
 						bedarfVorhanden = false;
 					}
@@ -595,7 +596,7 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {if (!aktuellerBedarf.getFirst()
-					.isEarlierThan(fahrzeug.getStartzeitBeladung500().addTime(endNutzMed500))) {
+					.isEarlierThan(fahrzeug.getStartzeitBeladung500().getNewInstance().addTime(endNutzMed500))) {
 						deckbarerBedarfVorhanden=false;
 					}} catch (Exception e) {deckbarerBedarfVorhanden=false;}
 				}

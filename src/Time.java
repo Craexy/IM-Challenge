@@ -46,7 +46,7 @@ public class Time implements Comparable<Time>{
 		}
 		//falls Zeit am Vortag liegt --> nur für ein Tag früher möglich
 				if (this.stunden<0) {
-					tage = tage+1;
+					tage = tage-1;
 					stunden = 24 + stunden;
 				}
 		return new Time(this.stunden, this.minuten, this.tage);
@@ -102,7 +102,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public String toString() {
-		if (this.tage>0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage+" Tage vorher.";
+		if (this.tage<0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage+" Tage vorher.";
 		else return ""+this.stunden+":"+this.minuten;
 	}
 
