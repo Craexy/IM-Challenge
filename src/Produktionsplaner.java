@@ -11,6 +11,8 @@ public class Produktionsplaner {
 	private LinkedList <Fahrzeug> fahrzeuge;
 	
 	private LinkedList <LinkedList<Integer>> fahrzeugBedarfe;
+	private LinkedList <LinkedList<Integer>> fahrzeugProduzierteMengen;
+	
 	private LinkedList <LinkedList<Time>> bedarfszeitpunkte;
 	private LinkedList <LinkedList<Time>> produktionsstartZeitpunkte;
 	
@@ -21,6 +23,7 @@ public class Produktionsplaner {
 		fahrzeugBedarfe = new LinkedList<LinkedList<Integer>>();
 		bedarfszeitpunkte = new LinkedList<LinkedList<Time>>();
 		produktionsstartZeitpunkte = new LinkedList<LinkedList<Time>>();
+		fahrzeugProduzierteMengen = new LinkedList <LinkedList<Integer>>();
 		
 		planeProduktion();
 		
@@ -43,36 +46,41 @@ public class Produktionsplaner {
 			
 			//Initialisierung der Zwischenspeicher für die relevanten Produktionsparameter
 			LinkedList<Integer> bedarfe = new LinkedList<Integer>();
+			LinkedList<Integer> produzierteMengen = new LinkedList<Integer>();
+			
 			LinkedList<Time>  produktionsende= new LinkedList<Time>();
 			LinkedList<Time> produktionsstart = new LinkedList<Time>();
 			
 			//Ein Fahrzeug wird betrachtet und alle die Produktion betreffenden Parameter werden berechnet
 			
+			//Die Medikamentanfragen eines Fahrzeuges
 			bedarfe.add(fahrzeuge.get(i).get60());
 			bedarfe.add(fahrzeuge.get(i).get120());
 			bedarfe.add(fahrzeuge.get(i).get250());
 			bedarfe.add(fahrzeuge.get(i).get500());
 			
+			//Berechne tatsächlich produzierte Mengen (Batches)
+			produzierteMengen.clear();
+			produzierteMengen.add((int)Math.ceil((double)bedarfe.get(0)/150)*150);
+			produzierteMengen.add((int)Math.ceil((double)bedarfe.get(1)/100)*100);
+			produzierteMengen.add((int)Math.ceil((double)bedarfe.get(2)/80)*80);
+			produzierteMengen.add((int)Math.ceil((double)bedarfe.get(3)/60)*120);
+			
+			//Die Endzeitpunkte der Produktion
 			produktionsende.clear();
 			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung60());
 			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung120());
 			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung250());
 			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung500());
 			
-			
-			//getProduktionsdauer und getStartzeitProduktion
-			int dauer60 = (int)Math.ceil((double)bedarfe.get(0)/150)*15;
-			int dauer120 = (int)Math.ceil((double)bedarfe.get(1)/150)*30;
-			int dauer250 = (int)Math.ceil((double)bedarfe.get(2)/150)*60;
-			int dauer500 = (int)Math.ceil((double)bedarfe.get(3)/150)*120;
-			
+			//Berechne Produktionsdauer
 			produktionsdauer.clear();
-			produktionsdauer.add(dauer60);
-			produktionsdauer.add(dauer120);
-			produktionsdauer.add(dauer250);
-			produktionsdauer.add(dauer500);
+			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(0)/150)*15);
+			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(1)/100)*30);
+			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(2)/80)*60);
+			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(3)/60)*120);
 			
-			
+			//Berechne die Startzeit der Produktion
 			Time spMed60 = produktionsende.get(0).getNewInstance().reduceTime(produktionsdauer.get(0));
 			Time spMed120 = produktionsende.get(1).getNewInstance().reduceTime(produktionsdauer.get(1));
 			Time spMed250 = produktionsende.get(2).getNewInstance().reduceTime(produktionsdauer.get(2));
@@ -102,6 +110,7 @@ public class Produktionsplaner {
 			
 			//Übergeordnetete Datenstruktur zum Zugriff auf alle Fahrzeuge
 			fahrzeugBedarfe.add(bedarfe);
+			fahrzeugProduzierteMengen.add(produzierteMengen);
 			produktionsstartZeitpunkte.add(produktionsstart);
 			bedarfszeitpunkte.add(produktionsende);
 			
@@ -142,19 +151,19 @@ public class Produktionsplaner {
 	    System.out.println(test2);	*/
 		//Daten in den äußeren LinkedLists stimmen
 		
-		Produktionslinie p1 =  new Produktionslinie(this);
-		Produktionslinie p2 =  new Produktionslinie(this);
-		Produktionslinie p3 =  new Produktionslinie(this);
-		Produktionslinie p4 =  new Produktionslinie(this);
+		Produktionslinie p1 =  new Produktionslinie(this,1);
+		Produktionslinie p2 =  new Produktionslinie(this,2);
+		Produktionslinie p3 =  new Produktionslinie(this,3);
+		Produktionslinie p4 =  new Produktionslinie(this,4);
 		
 		for(int k=0;k<fahrzeuge.size();k++){
 			
-			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
+			LinkedList<Integer> produktionsmenge = fahrzeugProduzierteMengen.get(k);
 			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
 			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
 			
-		    if(p1.assign(produktionsstart,produktionsende,bedarfe)){
-		    	System.out.println("Maschine P1 konnte belegt werden!");
+		    if(p1.assignControl(produktionsstart,produktionsende,produktionsmenge)){
+		    	System.out.println("OK!");
 		    }
 			
 		}

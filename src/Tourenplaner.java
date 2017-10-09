@@ -83,8 +83,6 @@ public class Tourenplaner {
 	    //Variante 1
 		//this.variante1();
 	    
-	 /*   boolean bedarfGedeckt = false;
-
 		//Variante 2
 		this.befülleDaten();
 		this.variante2();
@@ -93,8 +91,7 @@ public class Tourenplaner {
 	    
 	    //Fahrzeuge fahren alternativ nur zur Hälfte und kehren dann um
 	    
-/*	    boolean bedarfGedeckt = false;
- 		branch 'master' of https://github.com/Craexy/IM-Challenge
+	 /*   boolean bedarfGedeckt = false;
 	    do {
 	    	//welche Medikamente sind zu welchem Zeitpunkt noch übrig?
 	    	//ab wann/bis wann sind diese Medikamente nutzbar?
