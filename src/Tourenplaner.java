@@ -1,7 +1,9 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class Tourenplaner {
@@ -79,16 +81,18 @@ public class Tourenplaner {
 		entladezeiten.put("H", entladezeitH);
 		
 		//Daten mit Uhrzeiten der Bedarfe werden eingelesen
-		//this.befülleDaten();
+		this.befülleDaten();
 	    //Variante 1
 		//this.variante1();
 	    
+		System.out.println("+++   Variante 1   +++");
+		this.variante1();
+
 		//Variante 2
+		/*System.out.println("+++   Variante 2   +++");
 		this.befülleDaten();
-		this.variante2();
-	   
-	    
-	    
+		this.variante2();*/
+ 
 	    //Fahrzeuge fahren alternativ nur zur Hälfte und kehren dann um
 	    
 	 /*   boolean bedarfGedeckt = false;
@@ -412,6 +416,56 @@ public class Tourenplaner {
 		fahrzeuge.add(fahrzeug2);
 	}
 	
+	public void verteileReste(MedUeberschuss überschuss) {
+		Time startNutzung;
+		Time endNutzung;
+		LinkedList<Time> aktuellerBedarf;
+		
+		//Map mit allen möglichen, deckbaren Bedarfen
+		Map<String, Integer> deckbareBedarfe = new HashMap<String,Integer>();
+		
+		if (überschuss.getMedTyp()==60) {
+			startNutzung = überschuss.getStartProduktion().addTime(startNutzMed60);
+			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed60);
+			for (Entry<String, LinkedList<Time>> e : bedarfe.entrySet()){
+				aktuellerBedarf = (LinkedList<Time>)e.getValue();
+				//Deckbarer Bedarf in aktuell betrachtetem Standort
+				int lokalDeckbareBedarfe = 0;
+				for (int j=0;j<aktuellerBedarf.size();j++) {
+					if (aktuellerBedarf.get(j).isLaterThan(startNutzung.getNewInstance().reduceTime(1))
+							&&aktuellerBedarf.get(j).isEarlierThan(endNutzung.getNewInstance().reduceTime(1))) {
+						lokalDeckbareBedarfe = lokalDeckbareBedarfe + 1;	
+					}
+				deckbareBedarfe.put(e.getKey(), lokalDeckbareBedarfe);
+				}
+				
+			}
+		}
+		
+		if (überschuss.getMedTyp()==120) {
+			startNutzung = überschuss.getStartProduktion().addTime(startNutzMed120);
+			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed120);
+		}
+		
+		if (überschuss.getMedTyp()==250) {
+			startNutzung = überschuss.getStartProduktion().addTime(startNutzMed250);
+			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed250);	
+		}
+		
+		if (überschuss.getMedTyp()==500) {
+			startNutzung = überschuss.getStartProduktion().addTime(startNutzMed60);
+			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed500);
+		}
+		int lokalDeckbareBedarfe=0;
+		String anzufahrenderOrt ="";
+		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
+			if (e.getValue()>lokalDeckbareBedarfe) anzufahrenderOrt = e.getKey();
+			System.out.println(e.getValue()+" Bedarfe in Standort "+e.getKey()+" abdeckbar.");
+		}
+		
+		
+	}
+	
 	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
 		//Zeit zu der das Fahrzeug wieder zurück im Depot ist
 		Time endzeit = new Time(0,0,0);
@@ -444,8 +498,8 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
-						if (aktuellerBedarf.getFirst()
-								.isEarlierThan(fahrzeug.getStartzeitBeladung60().addTime(endNutzMed60)))
+						if (!aktuellerBedarf.getFirst()
+								.isEarlierThan(fahrzeug.getStartzeitBeladung60().getNewInstance().addTime(endNutzMed60)))
 							bedarfVorhanden=false;
 					} catch (Exception e) {
 						bedarfVorhanden = false;
@@ -497,8 +551,8 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
-						if (aktuellerBedarf.getFirst()
-								.isEarlierThan(fahrzeug.getStartzeitBeladung120().addTime(endNutzMed120))) bedarfVorhanden = false;
+						if (!aktuellerBedarf.getFirst()
+								.isEarlierThan(fahrzeug.getStartzeitBeladung120().getNewInstance().addTime(endNutzMed120))) bedarfVorhanden = false;
 					} catch (Exception e) {
 						bedarfVorhanden = false;
 					}
@@ -544,7 +598,7 @@ public class Tourenplaner {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
 					if (!aktuellerBedarf.getFirst()
-							.isEarlierThan(fahrzeug.getStartzeitBeladung250().addTime(endNutzMed250))) bedarfVorhanden = false;}
+							.isEarlierThan(fahrzeug.getStartzeitBeladung250().getNewInstance().addTime(endNutzMed250))) bedarfVorhanden = false;}
 					catch (Exception e) {
 						bedarfVorhanden = false;
 					}
@@ -592,7 +646,7 @@ public class Tourenplaner {
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {if (!aktuellerBedarf.getFirst()
-					.isEarlierThan(fahrzeug.getStartzeitBeladung500().addTime(endNutzMed500))) {
+					.isEarlierThan(fahrzeug.getStartzeitBeladung500().getNewInstance().addTime(endNutzMed500))) {
 						deckbarerBedarfVorhanden=false;
 					}} catch (Exception e) {deckbarerBedarfVorhanden=false;}
 				}
@@ -626,9 +680,15 @@ public class Tourenplaner {
 		System.out.println("Bedarf F benötigt "+bedarfF.size()+" weitere Medikamente");
 		System.out.println("Bedarf G benötigt "+bedarfG.size()+" weitere Medikamente");
 		System.out.println("Bedarf H benötigt "+bedarfH.size()+" weitere Medikamente");
+		int gesamtBedarf = bedarfA.size()+bedarfB.size()+bedarfC.size()+bedarfD.size()+bedarfE.size()+bedarfF.size()+bedarfG.size()+bedarfH.size();
+		System.out.println("Insgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
 		
 		System.out.println("Das Fahrzeug kehrt um "+endzeit+" in das Depot zurück." );
 		return fahrzeug;
+	}
+	
+	private Fahrzeug resteFahrzeugSchicken(String Stopp) {
+		return null;
 	}
 	
 	private double berechneVerblHaltbarkeit30(double Radioaktivität) {
