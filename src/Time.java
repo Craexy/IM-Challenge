@@ -38,6 +38,7 @@ public class Time implements Comparable<Time>{
 		if (Minuten<0) throw new IllegalArgumentException();
 		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
 		else {
+			if (Minuten>this.minuten) this.stunden = this.stunden -1;
 			int tempStunden = Minuten/60;
 			this.stunden = this.stunden - tempStunden;
 			int tempMinuten = Minuten-60*tempStunden;

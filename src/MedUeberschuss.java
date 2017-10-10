@@ -6,7 +6,18 @@ public class MedUeberschuss {
 	private Time startProduktion;
 	
 	public MedUeberschuss(int medTyp,  int anzahlMeds, Time startProduktion) {
-		this.medTyp=medTyp;
+		switch(medTyp) {
+		case 0: this.medTyp = 60;
+			break;
+		case 1: this.medTyp = 120;
+			break;
+		case 2: this.medTyp = 250;
+			break;
+		case 3: this.medTyp = 500;
+			break;
+		default: this.medTyp=medTyp;
+			break;
+		}
 		this.anzahlMeds=anzahlMeds;
 		this.startProduktion=startProduktion.getNewInstance();
 	}
@@ -23,6 +34,9 @@ public class MedUeberschuss {
 		return startProduktion;
 	}
 	
+	public String toString() {
+		return anzahlMeds+" Einheiten Überschuss vom Typ Med"+medTyp+", die zum Zeitpunkt "+startProduktion.toString()+" produziert werden.";
+	}
 	
 
 }
