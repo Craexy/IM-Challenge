@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class Tourenplaner {
@@ -416,6 +417,12 @@ public class Tourenplaner {
 		fahrzeuge.add(fahrzeug2);
 	}
 	
+	public void verteileReste(MedUeberschuss[] überschüsse) {
+		for (int i=0;i<überschüsse.length;i++) {
+			this.verteileReste(überschüsse[i]);
+		}
+	}
+	
 	public void verteileReste(MedUeberschuss überschuss) {
 		Time startNutzung;
 		Time endNutzung;
@@ -425,7 +432,7 @@ public class Tourenplaner {
 		Map<String, Integer> deckbareBedarfe = new HashMap<String,Integer>();
 		
 		if (überschuss.getMedTyp()==60) {
-			startNutzung = überschuss.getStartProduktion().addTime(startNutzMed60);
+			startNutzung = überschuss.getStartProduktion().getNewInstance().addTime(startNutzMed60);
 			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed60);
 			for (Entry<String, LinkedList<Time>> e : bedarfe.entrySet()){
 				aktuellerBedarf = (LinkedList<Time>)e.getValue();
@@ -459,14 +466,30 @@ public class Tourenplaner {
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
-			if (e.getValue()>lokalDeckbareBedarfe) anzufahrenderOrt = e.getKey();
+			if (e.getValue()>lokalDeckbareBedarfe) { anzufahrenderOrt = e.getKey();
+			lokalDeckbareBedarfe = e.getValue();}
 			System.out.println(e.getValue()+" Bedarfe in Standort "+e.getKey()+" abdeckbar.");
 		}
+		System.out.println("Ort "+anzufahrenderOrt+" wird zuerst angefahren.");
 		
+		this.resteFahrzeugSchicken(anzufahrenderOrt);
 		
 	}
 	
 	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
+		//@TODO: Funktion schreiben, um optimale Strecke zu finden, wenn Knoten removed wurde
+		//Buchstaben aus Strecke entfernen, an denen Bedarf gedeckt ist
+		
+		String tempStrecke = strecke;
+		strecke="";
+		for (int i=0;i<tempStrecke.split(",").length;i++) {
+			if (!bedarfe.get(tempStrecke.split(",")[i]).isEmpty()) {
+				strecke = strecke+tempStrecke.split(",")[i]+",";
+			}
+		}
+		
+		
+		
 		//Zeit zu der das Fahrzeug wieder zurück im Depot ist
 		Time endzeit = new Time(0,0,0);
 		Fahrzeug fahrzeug = new Fahrzeug();
@@ -492,21 +515,19 @@ public class Tourenplaner {
 			//Solange Bedarf vorhanden ist, der durch das aktuelle Fahrzeug durch Med60 gedeckt werden kann 
 			//soll dies getan werden
 			//Geprüft ob Bedarf vorhanden ist, nachdem das Fahrzeug beim Standort ankommt UND bevor das Medikament abgelaufen ist
-				
 				LinkedList<Time> frühBedarf = new LinkedList<Time>();
 				boolean bedarfVorhanden = true;
 				do {
 					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
 						if (!aktuellerBedarf.getFirst()
-								.isEarlierThan(fahrzeug.getStartzeitBeladung60().getNewInstance().addTime(endNutzMed60)))
-							bedarfVorhanden=false;
+								.isEarlierThan(fahrzeug.getStartzeitBeladung60().getNewInstance().addTime(endNutzMed60))) bedarfVorhanden = false;
 					} catch (Exception e) {
 						bedarfVorhanden = false;
 					}
-					
 				}
 				while (bedarfVorhanden);
+
 				
 				deckbarerBedarfVorhanden=true;
 				do {
@@ -529,8 +550,16 @@ public class Tourenplaner {
 			}
 	    
 	    LinkedList<Time> bedarfAnErstemStopp = new LinkedList<Time>();
-	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
-	    Time start120 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed120));
+	    Time start120 = null;
+	    for (int i = 0; i<8; i++) {
+	    try {
+	    	bedarfAnErstemStopp = bedarfe.get(fahrzeug.getStrecke().split(",")[i]);
+	    	start120 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed120));
+	    	if (start120!=null) break;
+	    	}
+	    catch (NoSuchElementException e) {
+	    	}
+	    }
 		if (start120.isEarlierThan(fahrzeug.getStartzeitFahrt())) {
 		fahrzeug.setStartzeitBeladung120(start120);}
 		else fahrzeug.setStartzeitBeladung120(fahrzeug.getStartzeitFahrt());	    
@@ -549,8 +578,8 @@ public class Tourenplaner {
 				LinkedList<Time> frühBedarf = new LinkedList<Time>();
 				boolean bedarfVorhanden = true;
 				do {
-					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 						if (!aktuellerBedarf.getFirst()
 								.isEarlierThan(fahrzeug.getStartzeitBeladung120().getNewInstance().addTime(endNutzMed120))) bedarfVorhanden = false;
 					} catch (Exception e) {
@@ -574,9 +603,16 @@ public class Tourenplaner {
 				
 				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
 			}
-	    bedarfAnErstemStopp = new LinkedList<Time>();
-	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
-	    Time start250 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed250));
+	    Time start250 = null;
+	    for (int i = 0; i<8; i++) {
+	    try {
+	    	bedarfAnErstemStopp = bedarfe.get(fahrzeug.getStrecke().split(",")[i]);
+	    	start250 = (bedarfAnErstemStopp.getFirst().getNewInstance().reduceTime(startNutzMed250));
+	    	if (start250!=null) break;
+	    	}
+	    catch (NoSuchElementException e) {
+	    	}
+	    }
 		if (start250.isEarlierThan(fahrzeug.getStartzeitFahrt())) {
 		fahrzeug.setStartzeitBeladung250(start250);}
 		else fahrzeug.setStartzeitBeladung250(fahrzeug.getStartzeitFahrt());
@@ -595,8 +631,8 @@ public class Tourenplaner {
 				LinkedList<Time> frühBedarf = new LinkedList<Time>();
 				boolean bedarfVorhanden = true;
 				do {
-					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					try {
+					frühBedarf.addFirst(aktuellerBedarf.removeFirst());
 					if (!aktuellerBedarf.getFirst()
 							.isEarlierThan(fahrzeug.getStartzeitBeladung250().getNewInstance().addTime(endNutzMed250))) bedarfVorhanden = false;}
 					catch (Exception e) {
@@ -688,7 +724,23 @@ public class Tourenplaner {
 	}
 	
 	private Fahrzeug resteFahrzeugSchicken(String Stopp) {
-		return null;
+		String[] list = routenplaner.getRoute().split(",");		
+		int index = -1;
+	    for (int i = 0; (i < list.length) && (index == -1); i++) {
+	        if (list[i].equals(Stopp)) {
+	            index = i;
+	        }
+	    }
+	    
+	    String strecke = "";
+	    for (int i = index; i<list.length;i++) {
+	    	strecke = strecke +list[i]+",";
+	    }
+	    System.out.println(strecke);
+	    
+	    Fahrzeug fahrzeug = this.neuesFahrzeugSchicken(strecke);
+	    
+		return fahrzeug;
 	}
 	
 	private double berechneVerblHaltbarkeit30(double Radioaktivität) {
