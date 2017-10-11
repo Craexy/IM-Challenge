@@ -1,3 +1,5 @@
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class MedUeberschuss {
 	
@@ -5,8 +7,14 @@ public class MedUeberschuss {
 	private int anzahlMeds;
 	private Time startProduktion;
 	
-	public MedUeberschuss(int medTyp,  int anzahlMeds, Time startProduktion) {
-		switch(medTyp) {
+	public MedUeberschuss(LinkedList<Integer> medUndUeberschuss, Time startProduktion) {
+		
+		this.anzahlMeds = medUndUeberschuss.getLast();
+		this.startProduktion=startProduktion.getNewInstance();
+		
+		int medTypTemp = medUndUeberschuss.getFirst();
+		
+		switch(medTypTemp) {
 		case 0: this.medTyp = 60;
 			break;
 		case 1: this.medTyp = 120;
@@ -15,11 +23,11 @@ public class MedUeberschuss {
 			break;
 		case 3: this.medTyp = 500;
 			break;
-		default: this.medTyp=medTyp;
+		default: this.medTyp=medTypTemp;
 			break;
 		}
-		this.anzahlMeds=anzahlMeds;
-		this.startProduktion=startProduktion.getNewInstance();
+		
+		System.out.println("Dieser MedUeberschuss wurde erzeugt: "+medTyp+"  "+anzahlMeds+"   "+startProduktion);
 	}
 	
 	public int getMedTyp() {

@@ -8,11 +8,9 @@ public class Produktionslinie {
 	
 	private LinkedList <Time> belegtvon;
 	private LinkedList <Time> belegtbis;
-	//LinkedList <Integer> belegtmitMenge;	//Veraltet, weil man auf die Mengen und Meds zugreifen muss nachdem belegtvon und belegtbis sortiert wurden
-	//LinkedList <Integer> belegtmitMed;
 	private Map<Time, Integer> belegtMitMenge;
-	//0=Med60;1=Med120;2=Med250;3=Med500 //kann mit methode changeIndexToTypeOfMed umgewandelt werden
-	private Map<Time, Integer> belegtMitMed;
+	
+	private Map<Time, Integer> belegtMitMed; //0=Med60;1=Med120;2=Med250;3=Med500 //kann mit methode changeIndexToTypeOfMed umgewandelt werden
 	
 	HashMap<Time, LinkedList<Integer>> ueberschuesse; //LinkedList(0)=medTyp;LinkedList(1)=ueberschuss für die Produktion zu einem best. Zeitpunkt (->Key)
 	

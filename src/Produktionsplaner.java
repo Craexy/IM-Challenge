@@ -20,6 +20,9 @@ public class Produktionsplaner {
 	private LinkedList <LinkedList<Time>> bedarfszeitpunkte;
 	private LinkedList <LinkedList<Time>> produktionsstartZeitpunkte;
 	
+	private Map<Integer,Produktionslinie> produktionslinien;
+	private LinkedList <MedUeberschuss> medUeberschuesse;
+	
 	
 	public Produktionsplaner(LinkedList<Fahrzeug> fahrzeuge){
 		this.fahrzeuge = fahrzeuge;	
@@ -28,6 +31,9 @@ public class Produktionsplaner {
 		bedarfszeitpunkte = new LinkedList<LinkedList<Time>>();
 		produktionsstartZeitpunkte = new LinkedList<LinkedList<Time>>();
 		fahrzeugProduzierteMengen = new LinkedList <LinkedList<Integer>>();
+		
+		produktionslinien = new HashMap<Integer,Produktionslinie>();
+		medUeberschuesse = new LinkedList<MedUeberschuss>();
 		
 		planeProduktion();
 		
@@ -147,8 +153,6 @@ public class Produktionsplaner {
 	}
 	
 	public void assignProductionLines(){
-		
-		Map<Integer,Produktionslinie> produktionslinien = new HashMap<Integer,Produktionslinie>();
 		int anzahlDerProduktionslinien = 4; //Hier ist die Anzahl der Produktionslinien anpassbar
 		
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
@@ -182,15 +186,13 @@ public class Produktionsplaner {
 				//p1.transform meds
 			
 		}
-		//Die MedUeberschuss-Objekte instatiieren
-		HashMap<Time, LinkedList<Integer>> ueberschuesse = produktionslinien.get(1).getUeberschuesse();
-		
-		System.out.println("\n");
-		System.out.println("Überschüsse P1:");
-		System.out.println(ueberschuesse);
-		
-			
-				
+		//Die MedUeberschuss-Objekte instanziieren
+		for(int i=1;i<=anzahlDerProduktionslinien;i++){
+			for(Time key : produktionslinien.get(i).getUeberschuesse().keySet()){
+				medUeberschuesse.add(new MedUeberschuss(produktionslinien.get(i).getUeberschuesse().get(key),key));
+			}
+		}
+					
 	}
 	
 	public LinkedList<LinkedList<Integer>> getFahrzeugBedarfe() {
