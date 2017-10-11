@@ -6,14 +6,15 @@ public class Produktionslinie {
 	private int id;
 	private Produktionsplaner prodp;
 	
-	LinkedList <Time> belegtvon;
-	LinkedList <Time> belegtbis;
-	LinkedList <Integer> ueberschuesse;
+	private LinkedList <Time> belegtvon;
+	private LinkedList <Time> belegtbis;
 	//LinkedList <Integer> belegtmitMenge;	//Veraltet, weil man auf die Mengen und Meds zugreifen muss nachdem belegtvon und belegtbis sortiert wurden
 	//LinkedList <Integer> belegtmitMed;
 	private Map<Time, Integer> belegtMitMenge;
 	//0=Med60;1=Med120;2=Med250;3=Med500 //kann mit methode changeIndexToTypeOfMed umgewandelt werden
 	private Map<Time, Integer> belegtMitMed;
+	
+	HashMap<Time, LinkedList<Integer>> ueberschuesse; //LinkedList(0)=medTyp;LinkedList(1)=ueberschuss für die Produktion zu einem best. Zeitpunkt (->Key)
 	
 
 	public Produktionslinie(Produktionsplaner prodp, int id){
@@ -22,29 +23,21 @@ public class Produktionslinie {
 		
 		belegtvon = new LinkedList<Time>();
 		belegtbis = new LinkedList<Time>();
-		ueberschuesse = new LinkedList<Integer>();
 		
 		belegtMitMenge = new HashMap<Time, Integer>();
 		belegtMitMed  = new HashMap<Time, Integer>();
 		
-	}
-	
-	public  Map<Integer, Integer> assignControl(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge){
-		LinkedList<Integer> indizes = getIndexMaximaleProduktionsmenge(produktionsmenge);
-		
-		LinkedList<Integer> restTemp = assign(produktionsstart,produktionsende,produktionsmenge,indizes);
-		Map<Integer,Integer> reste = new HashMap<Integer,Integer>();
-		for(int y=0;y<restTemp.size();y++){
-			reste.put(restTemp.get(y), produktionsmenge.get(restTemp.get(y)));
-		}
-		
-		return reste;
+		ueberschuesse = new HashMap<Time,LinkedList<Integer>>();
 	}
 
-	public LinkedList <Integer> assign(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge, LinkedList<Integer> indizes){
+	public LinkedList<Integer> assign(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge, LinkedList<Integer> bedarfe){
 		//In dieser Funktion schon Umwandeln von 60 in 120 oder ähnliches, um alle zu produzieren.
 		//wenn die Ladung nicht komplett produziert werden kann -> neue Produktionslinie -> Übergabe der Medikamente die diese produktionslinie nicht produzieren konnte
 		
+		LinkedList<Integer> indizes = getIndexMaximaleProduktionsmenge(produktionsmenge);
+		for(int i=0;i<produktionsmenge.size();i++){
+			//ueberschuesse.add(0);
+		}
 		
 		try{
 			//belegtvon und belegtbis sortieren und dann prüfen ob produktionsstart earlierthan belegtbis einträge
@@ -67,6 +60,9 @@ public class Produktionslinie {
 							belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
 							
 							System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
+
+							addUeberschuesse(bedarfe.get(indizes.getFirst()),0);
+							
 							indizes.removeFirst();
 						
 					}else{
@@ -88,20 +84,22 @@ public class Produktionslinie {
 								belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
 								belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
 								
+								addUeberschuesse(bedarfe.get(indizes.getFirst()),check);
+								
 								indizes.removeFirst();
 								
 								System.out.println(belegtvon);
 								System.out.println(belegtbis);
 							}else{
 								System.out.println("Nein");
-								//return indizes; //kein return an dieser stelle
-								//hier muss element ans ende der liste verschoben werden (sozusagen überspringen)
+								
+								indizes.offer(indizes.poll()); //Das Element an erster Stelle passt nicht, daher wird es übersprungen indem es
+															   //an die letzte Stelle der Prioritätsliste "indizes" gesetzt wird
 							}
 							
 							
 							//System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(index)+" bis "+produktionsende.get(index)+" mit "+produktionsmenge.get(index)+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(index)+" belegt!");
 							}else{
-							System.out.println("Alles Produktionsanfragen wurden an die Produktionslinien verteilt!");
 							return null;
 						}
 					
@@ -117,7 +115,19 @@ public class Produktionslinie {
 		}catch (NullPointerException e){
 			
 		}
-		return indizes;
+		
+		//Umwandeln der Reste in eine neue Produktionsmengenanfrage die der nächsten Produktionslinie übergeben werden kann
+		LinkedList<Integer> nochZuProduzieren = new LinkedList<Integer>();
+		if(!indizes.isEmpty()){
+			for(int y=0;y<produktionsmenge.size();y++){
+				nochZuProduzieren.add(0);
+			}
+			for(int i=0;i<indizes.size();i++){
+				nochZuProduzieren.set(indizes.get(i), produktionsmenge.get(indizes.get(i)));
+			}
+		}
+		
+		return nochZuProduzieren;
 		
 	}
 	
@@ -133,13 +143,14 @@ public class Produktionslinie {
 		
 		for(int z=0;z<belegtbis.size();z++){
 			if(produktionsstart.isLaterThan(belegtbis.get(z))){
-				index = z;
+				index = z+1;
+				
+				if(produktionsende.isEarlierThan(belegtvon.get(index))){
+					return index;
+				}
 			}
 		}
-		if(produktionsende.isEarlierThan(belegtvon.get(index+1))){
-			return index;
-		}
-
+		
 		return -1;
 	
 	}
@@ -198,6 +209,24 @@ public class Produktionslinie {
 		default: System.out.println("Fehler bezüglich des Indizes in getIndexMaximaleProduktionsmenge!");
 		}
 		return value;
+	}
+	
+	public void addUeberschuesse(int bedarf, int index){
+		LinkedList<Integer> tempDaten = new LinkedList<Integer>();
+
+		Time startProduktion = belegtvon.get(index);
+		int medTyp = belegtMitMed.get(startProduktion);
+		int ueberschuss = belegtMitMenge.get(startProduktion)-bedarf;
+			
+		tempDaten.clear();
+		tempDaten.add(medTyp);
+		tempDaten.add(ueberschuss);
+			
+		ueberschuesse.put(startProduktion, tempDaten);
+	}
+	
+	public HashMap<Time, LinkedList<Integer>> getUeberschuesse(){
+		return ueberschuesse;
 	}
 	
 }
