@@ -3,14 +3,14 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class Produktionslinie {
-	int id;
-	Produktionsplaner prodp;
+	private int id;
+	private Produktionsplaner prodp;
+	
 	LinkedList <Time> belegtvon;
 	LinkedList <Time> belegtbis;
+	LinkedList <Integer> ueberschuesse;
 	//LinkedList <Integer> belegtmitMenge;	//Veraltet, weil man auf die Mengen und Meds zugreifen muss nachdem belegtvon und belegtbis sortiert wurden
 	//LinkedList <Integer> belegtmitMed;
-	
-	
 	private Map<Time, Integer> belegtMitMenge;
 	//0=Med60;1=Med120;2=Med250;3=Med500 //kann mit methode changeIndexToTypeOfMed umgewandelt werden
 	private Map<Time, Integer> belegtMitMed;
@@ -22,104 +22,126 @@ public class Produktionslinie {
 		
 		belegtvon = new LinkedList<Time>();
 		belegtbis = new LinkedList<Time>();
-		//belegtmitMed = new LinkedList<Integer>();
-		//belegtmitMenge = new LinkedList<Integer>();
+		ueberschuesse = new LinkedList<Integer>();
 		
 		belegtMitMenge = new HashMap<Time, Integer>();
 		belegtMitMed  = new HashMap<Time, Integer>();
+		
 	}
 	
-	public  boolean assignControl(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge){
+	public  Map<Integer, Integer> assignControl(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge){
 		LinkedList<Integer> indizes = getIndexMaximaleProduktionsmenge(produktionsmenge);
-		LinkedList<Integer> rest = assign(produktionsstart,produktionsende,produktionsmenge,indizes);
-		//solange die aufaddierten werte von produktionsmenge >0
-		return true;
 		
-		//for schleife die abbricht wenn die iMax linked list nicht abgearbeitet werden kann wegen kapzitätsproblemen
-		//die indizes aus der iMax sind die Reste! diese werden zurückgegeben
+		LinkedList<Integer> restTemp = assign(produktionsstart,produktionsende,produktionsmenge,indizes);
+		Map<Integer,Integer> reste = new HashMap<Integer,Integer>();
+		for(int y=0;y<restTemp.size();y++){
+			reste.put(restTemp.get(y), produktionsmenge.get(restTemp.get(y)));
+		}
+		
+		return reste;
 	}
 
 	public LinkedList <Integer> assign(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge, LinkedList<Integer> indizes){
 		//In dieser Funktion schon Umwandeln von 60 in 120 oder ähnliches, um alle zu produzieren.
 		//wenn die Ladung nicht komplett produziert werden kann -> neue Produktionslinie -> Übergabe der Medikamente die diese produktionslinie nicht produzieren konnte
+		
+		
 		try{
 			//belegtvon und belegtbis sortieren und dann prüfen ob produktionsstart earlierthan belegtbis einträge
 			//produktionsstart
 			//statt index indizes.getFirst benutzen und die returnwerte ändern
-			if(belegtvon.size()==0){
-				//Test ob es Produktionsmengen gibt, wenn ja dann wird maximale genommen
-				
-				if(indizes!=null){
-					//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
-					//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
-					//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
+			if(indizes!=null){
+				int durchlauf = indizes.size();
+				//For-schleife um alles mit indizes.size()
+				for(int c=0;c<durchlauf;c++){
 					
-					belegtvon.add(produktionsstart.get(indizes.getFirst()));
-					belegtbis.add(produktionsende.get(indizes.getFirst()));
+					if(belegtvon.size()==0){
+							//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
+							//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
+							//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
+							
+							belegtvon.add(produktionsstart.get(indizes.getFirst()));
+							belegtbis.add(produktionsende.get(indizes.getFirst()));
+							
+							belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
+							belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
+							
+							System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
+							indizes.removeFirst();
+						
+					}else{
+						//Hier wenn schon aufträge vorhanden sind -> passt alles oder muss angepasst werden?
+						System.out.println("Es gibt eine Belegung der Produktionslinie, passen noch weitere?");
+						if(indizes!=null){
+							//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
+							//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
+							//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
+							
+							//Testen ob zeitliche Überlappung vorliegt
+							int check = checkForConflicts(produktionsstart.get(indizes.getFirst()),produktionsende.get(indizes.getFirst()));
+							if(check!=-1){
+								System.out.println("Ja");
+								//Sortiert einfügen
+								belegtvon.add(check, produktionsstart.get(indizes.getFirst()));
+								belegtbis.add(check, produktionsende.get(indizes.getFirst()));
+								
+								belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
+								belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
+								
+								indizes.removeFirst();
+								
+								System.out.println(belegtvon);
+								System.out.println(belegtbis);
+							}else{
+								System.out.println("Nein");
+								//return indizes; //kein return an dieser stelle
+								//hier muss element ans ende der liste verschoben werden (sozusagen überspringen)
+							}
+							
+							
+							//System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(index)+" bis "+produktionsende.get(index)+" mit "+produktionsmenge.get(index)+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(index)+" belegt!");
+							}else{
+							System.out.println("Alles Produktionsanfragen wurden an die Produktionslinien verteilt!");
+							return null;
+						}
 					
-					belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
-					belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
-					
-					//belegtmitMed.add(index);
-					//belegtmitMenge.add(produktionsmenge.get(index));
-					
-					System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
-					//Den Werte in Produktionsmenge zu 0 machen, damit sie nicht nochmal betrachtet werden und eine neue maximale produktionsmenge gefunden werden kann
-					//Die LinkedList produktionsmenge wird quasi abgearbeitet bis alles = 0 ist
-					//Die mengen bleiben aber in der Hashmap belegtmitMenge erhalten
-					produktionsmenge.set(indizes.getFirst(), 0);
-					return indizes;
-					//assign(produktionsstart,produktionsende,produktionsmenge); //Aufpassen beim rückgabewert der methode 
-				}else{
-					System.out.println("Es wurden keine Produktionsmengen angefragt.");
-					return indizes;
 				}
-				
+			}
 			}else{
-				//Hier wenn schon aufträge vorhanden sind -> passt alles oder muss angepasst werden?
-				System.out.println("Es gibt eine Belegung der Produktionslinie, passen noch weitere?");
-				if(indizes!=null){
-					//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
-					//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
-					//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
-					
-					//Testen ob zeitliche Überlappung vorliegt
-					//-> checkForConflicts()
-					
-					//Bei belegung auf Sortierung achten! compareTo()
-					//belegtvon.add(produktionsstart.get(index));
-				    //belegtbis.add(produktionsende.get(index));
-
-					//belegtMitMenge.put(produktionsstart.get(index), produktionsmenge.get(index));
-					//belegtMitMed.put(produktionsstart.get(index), index);
-					
-					
-					//System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(index)+" bis "+produktionsende.get(index)+" mit "+produktionsmenge.get(index)+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(index)+" belegt!");
-					//Den Werte in Produktionsmenge zu 0 machen, damit sie nicht nochmal betrachtet werden und eine neue maximale produktionsmenge gefunden werden kann
-					//Die LinkedList produktionsmenge wird quasi abgearbeitet bis alles = 0 ist
-					//Die mengen bleiben aber in der Hashmap belegtmitMenge erhalten
-					//produktionsmenge.set(index, 0);
-					//assign(produktionsstart,produktionsende,produktionsmenge); //Aufpassen beim rückgabewert der methode
-					//besprechen ob es theoretisch klappt die methode immer wieder selbst aufzurufen bis problem gelöst ist
-				}else{
-					System.out.println("Alles Produktionsanfragen wurden an die Produktionslinien verteilt!");
-					return indizes;
-				}
-				
+				System.out.println("Es wurden keine Produktionsmengen angefragt.");
+				return null;
 			}
 			
+			
+				
 		}catch (NullPointerException e){
 			
 		}
-		System.out.println("Ende");
 		return indizes;
 		
 	}
 	
-	public boolean checkForConflict(Time produktionsstart,Time produktionsende){
-		System.out.println("hier");
-		//Was muss hier zurückgegeben werden? Wahrscheinlich geht boolean
-		return false;
+	public int checkForConflicts(Time produktionsstart,Time produktionsende){
+		int index=-1;
+		
+		if(produktionsende.isEarlierThan(belegtvon.getFirst())){
+			return 0;
+		}
+		if(produktionsstart.isLaterThan(belegtbis.getLast())){
+			return belegtbis.size();
+		}
+		
+		for(int z=0;z<belegtbis.size();z++){
+			if(produktionsstart.isLaterThan(belegtbis.get(z))){
+				index = z;
+			}
+		}
+		if(produktionsende.isEarlierThan(belegtvon.get(index+1))){
+			return index;
+		}
+
+		return -1;
+	
 	}
 	
 	//@todo: neue Variante die zuerst die menge produziert die am ehesten dem Bedarf entspricht
@@ -143,11 +165,11 @@ public class Produktionslinie {
 						for(int l=1;l<iMax.size();l++){
 							if(produktionsmenge.get(i)>produktionsmenge.get(iMax.get(l))){
 								iMax.add(l, i);
-								l = iMax.size(); //endlosschleife vermeiden
+								break; //endlosschleife vermeiden
 							}
 							if(l==(iMax.size()-1)){
 								iMax.addLast(i);
-								l = iMax.size(); //endlosschleife vermeiden
+								break; //endlosschleife vermeiden
 							}
 						}
 						}

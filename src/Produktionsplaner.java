@@ -2,6 +2,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Produktionsplaner {
@@ -68,17 +69,18 @@ public class Produktionsplaner {
 			
 			//Die Endzeitpunkte der Produktion
 			produktionsende.clear();
-			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung60());
-			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung120());
-			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung250());
-			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung500());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung60().getNewInstance());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung120().getNewInstance());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung250().getNewInstance());
+			produktionsende.add(fahrzeuge.get(i).getStartzeitBeladung500().getNewInstance());
 			
 			//Berechne Produktionsdauer
 			produktionsdauer.clear();
-			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(0)/150)*15);
-			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(1)/100)*30);
-			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(2)/80)*60);
-			produktionsdauer.add((int)Math.ceil((double)bedarfe.get(3)/60)*120);
+			int z1 =((int)Math.ceil((double)produzierteMengen.get(0)/150)*15);
+			produktionsdauer.add((int)Math.ceil((double)produzierteMengen.get(0)/150)*15);
+			produktionsdauer.add((int)Math.ceil((double)produzierteMengen.get(1)/100)*30);
+			produktionsdauer.add((int)Math.ceil((double)produzierteMengen.get(2)/80)*60);
+			produktionsdauer.add((int)Math.ceil((double)produzierteMengen.get(3)/60)*120);
 			
 			//Berechne die Startzeit der Produktion
 			Time spMed60 = produktionsende.get(0).getNewInstance().reduceTime(produktionsdauer.get(0));
@@ -113,7 +115,6 @@ public class Produktionsplaner {
 			fahrzeugProduzierteMengen.add(produzierteMengen);
 			produktionsstartZeitpunkte.add(produktionsstart);
 			bedarfszeitpunkte.add(produktionsende);
-			
 			
 		}
 		
@@ -157,15 +158,24 @@ public class Produktionsplaner {
 		Produktionslinie p4 =  new Produktionslinie(this,4);
 		
 		for(int k=0;k<fahrzeuge.size();k++){
-			
+			System.out.println("Fahrzeug "+(k+1)+" /////////////////////////");
 			LinkedList<Integer> produktionsmenge = fahrzeugProduzierteMengen.get(k);
+			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
 			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
 			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
 			
-		    if(p1.assignControl(produktionsstart,produktionsende,produktionsmenge)){
-		    	System.out.println("OK!");
-		    }
-			
+			Map<Integer, Integer> reste;
+		    reste = p1.assignControl(produktionsstart,produktionsende,produktionsmenge);
+			if(!reste.isEmpty()){
+				System.out.println("Es wird eine weitere Produktionslinie benötigt!");
+				//Nicht produzierbare Restaufträge stehen in reste
+				//Überschüsse mit switch-anweisung ermitteln mit for schleife durch die reste linked list gehen für switch-wert 
+				//bspw. case 0 -> produktionsmenge[0]-bedarfe[0]
+				//p1.transform meds
+				//if reste!=null -> p2.assignControl usw.
+			}else{
+				System.out.println("Der gesamte Auftrag konnte auf einer Produktionslinie produziert werden");
+			}
 		}
 				
 	}
