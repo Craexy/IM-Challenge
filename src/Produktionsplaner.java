@@ -1,8 +1,11 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Produktionsplaner {
@@ -17,6 +20,9 @@ public class Produktionsplaner {
 	private LinkedList <LinkedList<Time>> bedarfszeitpunkte;
 	private LinkedList <LinkedList<Time>> produktionsstartZeitpunkte;
 	
+	private Map<Integer,Produktionslinie> produktionslinien;
+	private LinkedList <MedUeberschuss> medUeberschuesse;
+	
 	
 	public Produktionsplaner(LinkedList<Fahrzeug> fahrzeuge){
 		this.fahrzeuge = fahrzeuge;	
@@ -25,6 +31,9 @@ public class Produktionsplaner {
 		bedarfszeitpunkte = new LinkedList<LinkedList<Time>>();
 		produktionsstartZeitpunkte = new LinkedList<LinkedList<Time>>();
 		fahrzeugProduzierteMengen = new LinkedList <LinkedList<Integer>>();
+		
+		produktionslinien = new HashMap<Integer,Produktionslinie>();
+		medUeberschuesse = new LinkedList<MedUeberschuss>();
 		
 		planeProduktion();
 		
@@ -144,40 +153,46 @@ public class Produktionsplaner {
 	}
 	
 	public void assignProductionLines(){
+		int anzahlDerProduktionslinien = 4; //Hier ist die Anzahl der Produktionslinien anpassbar
 		
-		/*LinkedList<Time> test = produktionsstartZeitpunkte.get(1);
-		LinkedList<Time> test2 = bedarfszeitpunkte.get(1);
-		
-	    System.out.println(test);	
-	    System.out.println(test2);	*/
-		//Daten in den ‰uﬂeren LinkedLists stimmen
-		
-		Produktionslinie p1 =  new Produktionslinie(this,1);
-		Produktionslinie p2 =  new Produktionslinie(this,2);
-		Produktionslinie p3 =  new Produktionslinie(this,3);
-		Produktionslinie p4 =  new Produktionslinie(this,4);
+		for(int i=1;i<=anzahlDerProduktionslinien;i++){
+			produktionslinien.put(i,new Produktionslinie(this,i));
+		}
 		
 		for(int k=0;k<fahrzeuge.size();k++){
-			System.out.println("Fahrzeug "+(k+1)+" /////////////////////////");
-			LinkedList<Integer> produktionsmenge = fahrzeugProduzierteMengen.get(k);
+			System.out.println("");
+			System.out.println("/////// "+"Fahrzeug "+(k+1)+" ////////");
+			System.out.println("");
 			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
 			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
 			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
+			LinkedList<Integer> nochZuProduzieren = fahrzeugProduzierteMengen.get(k);
 			
-			Map<Integer, Integer> reste;
-		    reste = p1.assignControl(produktionsstart,produktionsende,produktionsmenge);
-			if(!reste.isEmpty()){
-				System.out.println("Es wird eine weitere Produktionslinie benˆtigt!");
-				//Nicht produzierbare Restauftr‰ge stehen in reste
+			int id=1; //F¸r jedes Fahrzeug beginnt die Belegung bei Produktionslinie 1
+			while(!nochZuProduzieren.isEmpty() | id>4){
+				nochZuProduzieren = produktionslinien.get(id).assign(produktionsstart,produktionsende,nochZuProduzieren,bedarfe);
+				id++;
+				if(!nochZuProduzieren.isEmpty()){
+					//Hier bevor die n‰chste Produktionslinie erˆffnet wird erstmal transform() probieren
+					//Tauschen auch beachten: Also wenn z.B. statt 50, 200 Einheiten produzeirt werden kˆnnen aber der Zeitslot von dem 50er Auftrag blockiert wird -> den dann gar nicht produzieren oder verschieben
+					System.out.println("Es wird eine weitere Produktionslinie benˆtigt!");
+				}
+			}
+			System.out.println("Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
+			
+				//Nicht produzierbare Restauftr‰ge stehen in reste -> in kleinere mˆgliche produktionmenge umwandeln transformMeds() -> neu assignen sonst neue produktionslinie
 				//‹bersch¸sse mit switch-anweisung ermitteln mit for schleife durch die reste linked list gehen f¸r switch-wert 
 				//bspw. case 0 -> produktionsmenge[0]-bedarfe[0]
 				//p1.transform meds
-				//if reste!=null -> p2.assignControl usw.
-			}else{
-				System.out.println("Der gesamte Auftrag konnte auf einer Produktionslinie produziert werden");
+			
+		}
+		//Die MedUeberschuss-Objekte instanziieren
+		for(int i=1;i<=anzahlDerProduktionslinien;i++){
+			for(Time key : produktionslinien.get(i).getUeberschuesse().keySet()){
+				medUeberschuesse.add(new MedUeberschuss(produktionslinien.get(i).getUeberschuesse().get(key),key));
 			}
 		}
-				
+					
 	}
 	
 	public LinkedList<LinkedList<Integer>> getFahrzeugBedarfe() {
