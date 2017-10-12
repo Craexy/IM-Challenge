@@ -113,4 +113,27 @@ public class Time implements Comparable<Time>{
 		if (this.isEarlierThan(Zeit)) return -1;
 		return 0;
 	}
+	
+	public static int getDifferenceInMinutes(Time zeit1, Time zeit2) {
+		int tempStunden = 0;
+		int tempMinuten = 0;
+		if (zeit1.compareTo(zeit2)==1) {
+			tempStunden = zeit1.getStunden()-zeit2.getStunden();
+			tempMinuten = zeit1.getMinuten()-zeit2.getMinuten();
+			if (tempMinuten<0) {
+				tempMinuten = tempMinuten + 60;
+				tempStunden--;
+			}
+		} 
+		if (zeit1.compareTo(zeit2)==-1) {
+			tempStunden = zeit2.getStunden()-zeit1.getStunden();
+			tempMinuten = zeit2.getMinuten()-zeit1.getMinuten();
+			if (tempMinuten<0) {
+				tempMinuten = tempMinuten + 60;
+				tempStunden--;
+			}
+		} 
+		
+		return tempStunden*60+tempMinuten;
+	}
 }
