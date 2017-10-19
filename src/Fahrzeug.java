@@ -11,6 +11,7 @@ public class Fahrzeug {
 	private Time startzeitBeladung120 = new Time(0,0,0);
 	private Time startzeitBeladung250 = new Time(0,0,0);
 	private Time startzeitBeladung500 = new Time(0,0,0);
+	private Time rückkehrZeit = null;
 	
 	public Fahrzeug(int Medikament60, int Medikament120, int Medikament250, int Medikament500) {
 		Med60 = Medikament60;
@@ -79,7 +80,14 @@ public class Fahrzeug {
 		return new Time (startzeitBeladung500.getStunden(), startzeitBeladung500.getMinuten(), 0);
 	}
 	
+	public Time getRückkehrZeit() {
+		if (rückkehrZeit==null) return null;
+		else return rückkehrZeit.getNewInstance();
+	}
 	
+	public void setRückkehrZeit(Time zeit){
+		this.rückkehrZeit = zeit.getNewInstance();
+	}
 	
 	public int get60() {
 		return Med60;

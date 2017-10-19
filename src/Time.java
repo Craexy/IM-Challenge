@@ -1,4 +1,3 @@
-
 public class Time implements Comparable<Time>{
 	
 	private int stunden;
@@ -16,25 +15,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public Time reduceTime(int Minuten) throws IllegalArgumentException{
-		/*if (Minuten<0) throw new IllegalArgumentException();
-		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
-		else {
-			if (Minuten%60==0){ this.stunden = this.stunden-Minuten/60;
-								
-			}
-			else {this.stunden = this.stunden - Minuten/60 - 1;
-			this.minuten = this.minuten + 60 - Minuten%60;}
-			if (this.minuten==60) {
-				minuten = 0;
-				stunden = stunden + 1;
-			}
-		}
-		//falls Zeit am Vortag liegt --> nur für ein Tag früher möglich
-		if (this.stunden<0) {
-			tage = tage-1;
-			stunden = 24 + stunden;
-		}
-		return new Time(stunden, minuten, tage);*/
+		//@TODO: Algorithmus korrigieren 
 		if (Minuten<0) throw new IllegalArgumentException();
 		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
 		else {
@@ -61,6 +42,11 @@ public class Time implements Comparable<Time>{
 			stunden = minuten/60;
 			minuten = minuten%60;
 		}
+		/*if (this.stunden>23) {
+			this.stunden = this.stunden - 24;
+			this.tage = this.tage+1;
+		}*/
+		
 		return new Time(stunden, minuten, 0);
 	}
 
@@ -103,7 +89,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public String toString() {
-		if (this.tage<0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage+" Tage vorher.";
+		if (this.tage<0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage*-1+" Tag(e) vorher.";
 		else return ""+this.stunden+":"+this.minuten;
 	}
 

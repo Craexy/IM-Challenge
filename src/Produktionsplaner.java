@@ -207,4 +207,8 @@ public class Produktionsplaner {
 		return bedarfszeitpunkte;
 	}
 	
+	public LinkedList<MedUeberschuss> getMedUeberschuesse() {
+		return medUeberschuesse;
+	}
+	
 }
