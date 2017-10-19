@@ -9,6 +9,7 @@ public class Produktionslinie {
 	private LinkedList <Time> belegtvon;
 	private LinkedList <Time> belegtbis;
 	private Map<Time, Integer> belegtMitMenge;
+	private Map<Time, Integer> urspruenglicheBedarfe;
 	
 	private Map<Time, Integer> belegtMitMed; //0=Med60;1=Med120;2=Med250;3=Med500 //kann mit methode changeIndexToTypeOfMed umgewandelt werden
 	
@@ -24,6 +25,8 @@ public class Produktionslinie {
 		
 		belegtMitMenge = new HashMap<Time, Integer>();
 		belegtMitMed  = new HashMap<Time, Integer>();
+		
+		urspruenglicheBedarfe = new HashMap<Time,Integer>();
 		
 		ueberschuesse = new HashMap<Time,LinkedList<Integer>>();
 	}
@@ -57,6 +60,8 @@ public class Produktionslinie {
 							belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
 							belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
 							
+							urspruenglicheBedarfe.put(produktionsstart.get(indizes.getFirst()), bedarfe.get(indizes.getFirst()));
+							
 							System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
 
 							addUeberschuesse(bedarfe.get(indizes.getFirst()),0);
@@ -82,6 +87,8 @@ public class Produktionslinie {
 								belegtMitMenge.put(produktionsstart.get(indizes.getFirst()), produktionsmenge.get(indizes.getFirst()));
 								belegtMitMed.put(produktionsstart.get(indizes.getFirst()), indizes.getFirst());
 								
+								urspruenglicheBedarfe.put(produktionsstart.get(indizes.getFirst()), bedarfe.get(indizes.getFirst()));
+								
 								addUeberschuesse(bedarfe.get(indizes.getFirst()),check);
 								
 								indizes.removeFirst();
@@ -90,7 +97,6 @@ public class Produktionslinie {
 								System.out.println(belegtbis);
 							}else{
 								System.out.println("Nein");
-								
 								indizes.offer(indizes.poll()); //Das Element an erster Stelle passt nicht, daher wird es übersprungen indem es
 															   //an die letzte Stelle der Prioritätsliste "indizes" gesetzt wird
 							}
@@ -125,11 +131,20 @@ public class Produktionslinie {
 			}
 		}
 		
+	
 		return nochZuProduzieren;
 		
 	}
 	
 	public int checkForConflicts(Time produktionsstart,Time produktionsende){
+		//muss ne Map zurückgeben mit <boolean,int>
+		//der boolean wert ist ob konflikt vorliegt, der int wert der index
+		//Die map in einer LinkedList speichern sodass jede produktionslinie alle Konflikte gespeichert hat
+		//Dann ne getconflictindex() methode damit im produktionsplaner transform() gemacht werden kann
+		//und die geringere Menge des konflikts umgewandelt werden kann (denn umwandeln = teurer)
+		
+		//ps. den index des confliktes herauszufinden ist gar nicht so leicht, daher erstmal immer die nochZuProduzieren 
+		//werte transformieren
 		int index=-1;
 		
 		if(produktionsende.isEarlierThan(belegtvon.getFirst())){
@@ -151,6 +166,32 @@ public class Produktionslinie {
 		
 		return -1;
 	
+	}
+	
+	public void addProduction(int position, Time startZeitpunkt, Time endZeitpunkt,int menge,int med,int ueberschuesse){
+		belegtvon.add(position, startZeitpunkt);
+		belegtbis.add(position,endZeitpunkt);
+		
+		belegtMitMenge.put(startZeitpunkt,menge);
+		belegtMitMed.put(startZeitpunkt, med);
+		
+		//ursprünglicheBedarfe noch dazu
+		//Überschüsse noch dazu
+
+		System.out.println("Die Produktion wurde zugefügt");
+	}
+	
+	public void removeProduction(Time startZeitpunt, Time endZeitpunkt,int ueberschuesse){
+		belegtvon.remove(startZeitpunt);
+		belegtbis.remove(endZeitpunkt);
+		
+		belegtMitMenge.remove(startZeitpunt);
+		belegtMitMed.remove(startZeitpunt);
+		
+		//ursprünglicheBedarfe noch dazu
+		//Überschüsse noch dazu
+		
+		System.out.println("Die Produktion wurde entfernt");
 	}
 	
 	//@todo: neue Variante die zuerst die menge produziert die am ehesten dem Bedarf entspricht
@@ -225,6 +266,34 @@ public class Produktionslinie {
 	
 	public HashMap<Time, LinkedList<Integer>> getUeberschuesse(){
 		return ueberschuesse;
+	}
+	
+	public boolean isUsed(){
+		if(belegtvon.size()>0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public LinkedList <Time> getBelegtvon(){
+		return belegtvon;
+	}
+	
+	public LinkedList <Time> getBelegtbis(){
+		return belegtbis;
+	}
+	
+	public Map<Time,Integer> getBelegtMitMenge(){
+		return belegtMitMenge;
+	}
+	
+	public Map<Time,Integer> getBelegtMitMed(){
+		return belegtMitMed;
+	}
+	
+	public Map<Time,Integer> getUrspruenglicheBedarfe(){
+		return urspruenglicheBedarfe;
 	}
 	
 }

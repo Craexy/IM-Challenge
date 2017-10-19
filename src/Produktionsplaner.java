@@ -169,23 +169,35 @@ public class Produktionsplaner {
 			LinkedList<Integer> nochZuProduzieren = fahrzeugProduzierteMengen.get(k);
 			
 			int id=1; //Für jedes Fahrzeug beginnt die Belegung bei Produktionslinie 1
-			while(!nochZuProduzieren.isEmpty() | id>4){
+			while(!nochZuProduzieren.isEmpty() | id>anzahlDerProduktionslinien){
 				nochZuProduzieren = produktionslinien.get(id).assign(produktionsstart,produktionsende,nochZuProduzieren,bedarfe);
-				id++;
+				//Tauschen auch beachten: Also wenn z.B. statt 50, 200 Einheiten produziert werden können aber der Zeitslot von dem 50er Auftrag blockiert wird -> den dann gar nicht produzieren oder verschieben
+				//swap();
+				
 				if(!nochZuProduzieren.isEmpty()){
-					//Hier bevor die nächste Produktionslinie eröffnet wird erstmal transform() probieren
-					//Tauschen auch beachten: Also wenn z.B. statt 50, 200 Einheiten produzeirt werden können aber der Zeitslot von dem 50er Auftrag blockiert wird -> den dann gar nicht produzieren oder verschieben
+					//vor transform teilmengen versuchen reinzulegen
+					//transform auf alle bereits belegten Produktionslinien anwenden, nicht nur auf momentan betrachtete (d.h. id übergeben und in transform() dann for i=0;i<=id;i++... und dann transformieren versuchen
+									
 					System.out.println("Es wird eine weitere Produktionslinie benötigt!");
+					id++;
 				}
 			}
-			System.out.println("Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
+			
+			
+			
+			if(!nochZuProduzieren.isEmpty()){
+				System.out.println("Alle Produktionslinien sind zu den angefragten Zeitpunkten bereits belegt, die Anfrage des Fahrzeuges "+(k+1)+" konnte nicht -oder nicht vollständig- produziert werden");
+			}else{
+				System.out.println("Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
+			}
 			
 				//Nicht produzierbare Restaufträge stehen in reste -> in kleinere mögliche produktionmenge umwandeln transformMeds() -> neu assignen sonst neue produktionslinie
-				//Überschüsse mit switch-anweisung ermitteln mit for schleife durch die reste linked list gehen für switch-wert 
-				//bspw. case 0 -> produktionsmenge[0]-bedarfe[0]
 				//p1.transform meds
 			
 		}
+		System.out.println("Attempt transformation to save a production line.");
+		transform();
+		
 		//Die MedUeberschuss-Objekte instanziieren
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
 			for(Time key : produktionslinien.get(i).getUeberschuesse().keySet()){
@@ -193,6 +205,133 @@ public class Produktionsplaner {
 			}
 		}
 					
+	}
+	
+	public int numberOfActiveProductionLines(){
+		int numberOf=0;
+		for(int i=1;i<=produktionslinien.size();i++){
+			if(produktionslinien.get(i).isUsed()){
+				numberOf++;
+			}
+		}
+		
+		return numberOf;
+	}
+	
+	public void cutAndTry(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> nochZuProduzieren, int id){
+		LinkedList<Integer> index = produktionslinien.get(id).getIndexMaximaleProduktionsmenge(nochZuProduzieren);
+		
+		for(int i : index){
+			System.out.println("Der Iterator hat diese Werte: "+i);
+			switch(i){
+			case 3: 
+					
+					break;
+			
+			case 2: 
+					
+					break;
+					
+			case 1: 
+					break;
+					
+			case 0: 
+					
+					break;
+					
+			default: break;
+				
+				//zu 120er Meds machen, zeitpunkte ändern, etc.
+				//...Siehe Tourenplaner für zeitenverschiebungen
+			}
+		}
+		
+	}
+	
+	public void transform(){
+		int numberOfProdLines = numberOfActiveProductionLines();
+		
+		for(int i=numberOfProdLines;i>1;i--){	//Die letzte genutzte PL wird betrachtet | es muss mehr als eine PL geben um die Produktionen auf die vorherige zu schieben
+			
+			Produktionslinie zumUmverteilen = produktionslinien.get(numberOfProdLines);
+			LinkedList<Time> belegtvon = zumUmverteilen.getBelegtvon();
+			LinkedList<Time> belegtbis = zumUmverteilen.getBelegtbis();
+			HashMap<Time, LinkedList<Integer>> ueberschuesse = zumUmverteilen.getUeberschuesse();
+			Map<Time,Integer> belegtMitMenge = zumUmverteilen.getBelegtMitMenge();
+			Map<Time,Integer> belegtMitMed = zumUmverteilen.getBelegtMitMed();
+			Map<Time,Integer> urspruenglicheBedarfe = zumUmverteilen.getUrspruenglicheBedarfe();
+			
+			LinkedList<TransformedMed> transformedMedObjects = new LinkedList<TransformedMed>();
+			
+			for(int k=0;k<belegtvon.size();k++){ //Die Umverteilung geschieht für jede Belegung in der letzten PL
+				
+				boolean successfull = false;
+				Time endzeitAktuell = belegtbis.get(k);
+				int medTypAktuell = belegtMitMed.get(belegtvon.get(k));
+				int mengeAktuell = belegtMitMenge.get(belegtvon.get(k));
+				
+				//Hier noch die anderen Werte die durch die umwandlung geändert werden ändern (Zeiten, Mengen)
+				//später einfügen dass maximal 1 mal transformiert werden darf (ne forschleife innerhalb der switch anweisung) und erst später eine 2. und 3. transformationen ausgeführt wird um zu vermeiden dass mehr 2er/3er-transformationen(mehr kosten) existieren als nötig
+				while(medTypAktuell<3 && !successfull){ //Solange transformieren bis keine transformation mehr möglich ist oder es geklappt hat
+					
+					//Überschüsse noch reinbringen/umverteilen
+					
+					switch(medTypAktuell){
+					case 0: //umwandlung zu 120er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/100)*100);
+							//endzeitAktuell =...
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+								//checkforconflicts (mit "aktuellen"/neuen Zeitwerten)
+								//int check = produktionslinien.get(j).checkForConflicts(, );
+								//Erstelle TransformedMed-Objekt mit den ganze neuen/aktuellen werten
+								//--> addProduction & removeProduction ABER: nur die informationen speichern (in TransformedMed-Objekten, die tatsächliche adduund remove funktion erst ausführen wenn alle einträge aus belegtvon verteilt werden konnten
+								//denn nur dann kann eine Produktionslinie gespart werden
+								//wenn erfolgreich: successfull == true und break;
+								
+							}
+							
+							
+							
+							break;
+							
+					case 1: //Umwandlung zu 250er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/80)*80);
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+								//siehe oben
+							}
+							
+							break;
+							
+					case 2: //Umwandlung zu 500er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/60)*120);
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+								//siehe oben
+							}
+							
+							break;
+						
+					default: //500er können nicht weiter umgewandelt werden
+							medTypAktuell++;
+							break;
+					}
+					
+				}
+
+			}
+			//Hier dann testen ob die transformedMedObjects.size()==belegtvon.size()
+			//wenn ja sind alle transformationen möglich und können durchgeführt werden
+			//d.h. alle belegungen der letzten PL entfernen und in TransformedMed Objekten steht die neue PL, der MedTyp, die Menge, die Start-und Endzeitpunkte und die Überschüsse
+			//--> addProduction()
+				//removeProduction()	
+			System.out.println("Konnte die PL gespart werden?");
+		}
+	
 	}
 	
 	public LinkedList<LinkedList<Integer>> getFahrzeugBedarfe() {
