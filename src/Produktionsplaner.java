@@ -273,14 +273,14 @@ public class Produktionsplaner {
 					
 					//Hier noch die anderen Werte die durch die umwandlung geändert werden ändern (Zeiten, Mengen)
 					//später einfügen dass maximal 1 mal transformiert werden darf und erst später eine 2. und 3. transformationen ausgeführt wird um zu vermeiden dass mehr 2er/3er-transformationen(mehr kosten) existieren als nötig
-					while(medTypAktuell<4 && !successfull){ //Solange transformieren bis keine transformation mehr möglich ist oder es geklappt hat
+					while(medTypAktuell<3 && !successfull){ //Solange transformieren bis keine transformation mehr möglich ist oder es geklappt hat
 						
 						//Überschüsse noch reinbringen/umverteilen
 						
 						switch(medTypAktuell){
 						case 0: //umwandlung zu 120er
 								medTypAktuell++;
-								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(k)/100)*100);
+								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/100)*100);
 								//endzeitAktuell =...
 								
 								//checkforconflicts (mit "aktuellen"/neuen Zeitwerten)
@@ -293,19 +293,19 @@ public class Produktionsplaner {
 								
 						case 1: //Umwandlung zu 250er
 								medTypAktuell++;
-								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(k)/80)*80);;
+								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/80)*80);
 								//checkforconflicts
 								//--> addProduction & removeProduction siehe oben 
 								//wenn erfolgreich: successfull == true
 								break;
 								
 						case 2: //Umwandlung zu 500er
-							medTypAktuell++;
-							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(k)/60)*120);;
-							//checkforconflicts
-							//--> addProduction & removeProduction siehe oben
-							//wenn erfolgreich: successfull == true
-							break;
+								medTypAktuell++;
+								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/60)*120);
+								//checkforconflicts
+								//--> addProduction & removeProduction siehe oben
+								//wenn erfolgreich: successfull == true
+								break;
 							
 						default: //500er können nicht weiter umgewandelt werden
 								medTypAktuell++;
@@ -321,6 +321,7 @@ public class Produktionsplaner {
 			//d.h. alle belegungen der letzten PL entfernen und in TransformedMed Objekten steht die neue PL, der MedTyp, die Menge, die Start-und Endzeitpunkte und die Überschüsse
 			//--> addProduction()
 				//removeProduction()	
+			System.out.println("Konnte die PL gespart werden?");
 		}
 	
 	}
