@@ -263,58 +263,66 @@ public class Produktionsplaner {
 			
 			LinkedList<TransformedMed> transformedMedObjects = new LinkedList<TransformedMed>();
 			
-			for(int j=1;j<=(numberOfProdLines-1);j++){ //Es wird versucht die Produktionen der letzten auf die anderen PL's zu verteilen, beginnend beid er ersten
-				for(int k=0;k<belegtvon.size();k++){ //Die Umverteilung geschieht für jede Belegung in der letzten PL
+			for(int k=0;k<belegtvon.size();k++){ //Die Umverteilung geschieht für jede Belegung in der letzten PL
+				
+				boolean successfull = false;
+				Time endzeitAktuell = belegtbis.get(k);
+				int medTypAktuell = belegtMitMed.get(belegtvon.get(k));
+				int mengeAktuell = belegtMitMenge.get(belegtvon.get(k));
+				
+				//Hier noch die anderen Werte die durch die umwandlung geändert werden ändern (Zeiten, Mengen)
+				//später einfügen dass maximal 1 mal transformiert werden darf (ne forschleife innerhalb der switch anweisung) und erst später eine 2. und 3. transformationen ausgeführt wird um zu vermeiden dass mehr 2er/3er-transformationen(mehr kosten) existieren als nötig
+				while(medTypAktuell<3 && !successfull){ //Solange transformieren bis keine transformation mehr möglich ist oder es geklappt hat
 					
-					boolean successfull = false;
-					Time endzeitAktuell = belegtbis.get(k);
-					int medTypAktuell = belegtMitMed.get(belegtvon.get(k));
-					int mengeAktuell = belegtMitMenge.get(belegtvon.get(k));
+					//Überschüsse noch reinbringen/umverteilen
 					
-					//Hier noch die anderen Werte die durch die umwandlung geändert werden ändern (Zeiten, Mengen)
-					//später einfügen dass maximal 1 mal transformiert werden darf und erst später eine 2. und 3. transformationen ausgeführt wird um zu vermeiden dass mehr 2er/3er-transformationen(mehr kosten) existieren als nötig
-					while(medTypAktuell<3 && !successfull){ //Solange transformieren bis keine transformation mehr möglich ist oder es geklappt hat
-						
-						//Überschüsse noch reinbringen/umverteilen
-						
-						switch(medTypAktuell){
-						case 0: //umwandlung zu 120er
-								medTypAktuell++;
-								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/100)*100);
-								//endzeitAktuell =...
-								
+					switch(medTypAktuell){
+					case 0: //umwandlung zu 120er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/100)*100);
+							//endzeitAktuell =...
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								//checkforconflicts (mit "aktuellen"/neuen Zeitwerten)
 								//int check = produktionslinien.get(j).checkForConflicts(, );
 								//Erstelle TransformedMed-Objekt mit den ganze neuen/aktuellen werten
 								//--> addProduction & removeProduction ABER: nur die informationen speichern (in TransformedMed-Objekten, die tatsächliche adduund remove funktion erst ausführen wenn alle einträge aus belegtvon verteilt werden konnten
 								//denn nur dann kann eine Produktionslinie gespart werden
-								//wenn erfolgreich: successfull == true
-								break;
+								//wenn erfolgreich: successfull == true und break;
 								
-						case 1: //Umwandlung zu 250er
-								medTypAktuell++;
-								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/80)*80);
-								//checkforconflicts
-								//--> addProduction & removeProduction siehe oben 
-								//wenn erfolgreich: successfull == true
-								break;
-								
-						case 2: //Umwandlung zu 500er
-								medTypAktuell++;
-								mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/60)*120);
-								//checkforconflicts
-								//--> addProduction & removeProduction siehe oben
-								//wenn erfolgreich: successfull == true
-								break;
+							}
 							
-						default: //500er können nicht weiter umgewandelt werden
-								medTypAktuell++;
-								break;
-						}
+							
+							
+							break;
+							
+					case 1: //Umwandlung zu 250er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/80)*80);
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+								//siehe oben
+							}
+							
+							break;
+							
+					case 2: //Umwandlung zu 500er
+							medTypAktuell++;
+							mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/60)*120);
+							
+							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+								//siehe oben
+							}
+							
+							break;
 						
+					default: //500er können nicht weiter umgewandelt werden
+							medTypAktuell++;
+							break;
 					}
-	
+					
 				}
+
 			}
 			//Hier dann testen ob die transformedMedObjects.size()==belegtvon.size()
 			//wenn ja sind alle transformationen möglich und können durchgeführt werden
