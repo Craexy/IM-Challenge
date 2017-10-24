@@ -168,30 +168,49 @@ public class Produktionslinie {
 	
 	}
 	
-	public void addProduction(int position, Time startZeitpunkt, Time endZeitpunkt,int menge,int med,int ueberschuesse){
+	public void addProduction(int position, Time startZeitpunkt, Time endZeitpunkt,int menge,int med,int ueberschuesse,int urspruenglicheBedarfe){
 		belegtvon.add(position, startZeitpunkt);
 		belegtbis.add(position,endZeitpunkt);
 		
 		belegtMitMenge.put(startZeitpunkt,menge);
 		belegtMitMed.put(startZeitpunkt, med);
-		
-		//ursprünglicheBedarfe noch dazu
-		//Überschüsse noch dazu
+		this.urspruenglicheBedarfe.put(startZeitpunkt, urspruenglicheBedarfe);
+		LinkedList<Integer> ueberschuesseList = new LinkedList<Integer>();
+		for(int i=0;i<4;i++){
+			ueberschuesseList.add(0);
+		}
+		ueberschuesseList.set(med, ueberschuesse);
+		this.ueberschuesse.put(startZeitpunkt, ueberschuesseList);
 
 		System.out.println("Die Produktion wurde zugefügt");
 	}
 	
-	public void removeProduction(Time startZeitpunt, Time endZeitpunkt,int ueberschuesse){
-		belegtvon.remove(startZeitpunt);
-		belegtbis.remove(endZeitpunkt);
+	public void removeProduction(boolean all,Time startZeitpunkt, Time endZeitpunkt,int ueberschuesse){
+		if(all==true){
+			removeAllProductions();
+			System.out.println("Alle Produktionen wurden entfernt");
+		}else{
+
+			belegtvon.remove(startZeitpunkt);
+			belegtbis.remove(endZeitpunkt);
+			
+			belegtMitMenge.remove(startZeitpunkt);
+			belegtMitMed.remove(startZeitpunkt);
+			urspruenglicheBedarfe.remove(startZeitpunkt);
+			this.ueberschuesse.remove(startZeitpunkt);
+			
+			System.out.println("Die Produktion wurde entfernt");
+		}
 		
-		belegtMitMenge.remove(startZeitpunt);
-		belegtMitMed.remove(startZeitpunt);
-		
-		//ursprünglicheBedarfe noch dazu
-		//Überschüsse noch dazu
-		
-		System.out.println("Die Produktion wurde entfernt");
+	}
+	
+	public void removeAllProductions(){
+		belegtvon.clear();
+		belegtbis.clear();
+		belegtMitMenge.clear();
+		belegtMitMed.clear();
+		ueberschuesse.clear();
+		urspruenglicheBedarfe.clear();
 	}
 	
 	//@todo: neue Variante die zuerst die menge produziert die am ehesten dem Bedarf entspricht
@@ -294,6 +313,17 @@ public class Produktionslinie {
 	
 	public Map<Time,Integer> getUrspruenglicheBedarfe(){
 		return urspruenglicheBedarfe;
+	}
+	
+	public int getKosten(){
+		int dauer =0;
+		//pro genutzte pl 3000
+		//1200 pro stunde
+		for(int i=0;i<belegtvon.size();i++){
+			dauer += Time.getDifferenceInMinutes(belegtvon.get(i), belegtbis.get(i));
+		}
+		int kosten = (dauer/60)*1200;
+		return kosten;
 	}
 	
 }
