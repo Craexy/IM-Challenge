@@ -250,11 +250,25 @@ public class Tourenplaner {
 			return;
 		}
 		System.out.println("Ort "+anzufahrenderOrt+" wird zuerst angefahren.");
-		this.resteFahrzeugSchicken(anzufahrenderOrt, überschuss);
+		//Nach dem Versuch übrig bleibende Bedarfe zu decken wird der restliche Überschuss wieder zurückgegeben
+		Object[] temp = this.resteFahrzeugSchicken(anzufahrenderOrt, überschuss);
+		fahrzeuge.add((Fahrzeug)temp[0]);
+		
+		//prüfen ob einzelnes Decken verbleibender Bedarfe billiger als Strafkosten ist
+		
+		//Zeiten für Bedarf A ausgeben und zwischenspeichern
+		//Fahrzeug für Standort A losschicken mit Überschuss
+		//Kosten des neuen Fahrzeugs berechenen und mit Strafkosten vergleichen
+		//Wenn Strafkosten geringer: Bedarf wiederherstellen und Fahrzeug löschen
+		
+		LinkedList<Time> betrachteterBedarf = new LinkedList<Time>();
+		betrachteterBedarf.addAll(bedarfA);
+		Object[] optional = neuesFahrzeugSchicken("A", (MedUeberschuss)temp[1]);
+		System.out.println("");
+		
 		
 	}
 
-	
 	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
 		//@TODO: Funktion schreiben, um optimale Strecke zu finden, wenn Knoten removed wurde
 		
@@ -559,7 +573,8 @@ public class Tourenplaner {
 		return fahrzeug;
 	}
 
-	private Fahrzeug neuesFahrzeugSchicken(String strecke, MedUeberschuss überschuss) {
+	//private Fahrzeug neuesFahrzeugSchicken(String strecke, MedUeberschuss überschuss) {
+	private Object[] neuesFahrzeugSchicken(String strecke, MedUeberschuss überschuss){
 		String tempStrecke = strecke;
 		strecke="";
 		for (int i=0;i<tempStrecke.split(",").length;i++) {
@@ -576,7 +591,10 @@ public class Tourenplaner {
 		String aktuellerStopp = "A";
 		Time ersterBedarf = bedarfe.get(strecke.split(",")[0]).getFirst().getNewInstance();
 		int fahrtzeit = Routenplaner.getFahrtzeit("A", strecke.split(",")[0]);
+		//Fahrzeug soll so losfahren, dass es zum Zeitpunkt des ersten Bedarfs ankommt
 	    Time zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(fahrtzeit);
+	    //Vor erstem Bedarf muss Medikament noch entladen werden --> Fahrzeug muss um diese Zeit früher ankommen
+	    zeitpunktAktuell.reduceTime(entladezeiten.get(strecke.split(",")[0]));
 	    if (!fahrzeuge.isEmpty()) {
 	    	for (Fahrzeug e:fahrzeuge) {
 	    		if (e.getRückkehrZeit()!=null) {
@@ -616,7 +634,7 @@ public class Tourenplaner {
 	    	for (int i=0; i<bedarf.size();i++) {
 	    		if (bedarf.get(i).isEarlierThan(überschuss.getEndNutzungszeit())&&
 	    				bedarf.get(i).isLaterThan(überschuss.getStartNutzungszeit())){
-	    			fahrzeug.setStartzeitFahrt(bedarf.get(i).getNewInstance());
+	    			fahrzeug.setStartzeitFahrt(bedarf.get(i).getNewInstance().reduceTime(entladezeiten.get(fahrzeug.getStrecke().split(",")[0])));
 	    			break;
 	    		}
 	    	}
@@ -656,10 +674,6 @@ public class Tourenplaner {
 				do {
 					try {
 					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell.getNewInstance().reduceTime(1))) {	
-						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung60().getNewInstance(), 60, frühBedarf.getFirst())) {
-							System.out.println("Badgegröße berücksichtigen!");
-							throw new IllegalArgumentException();
-						}
 						fahrzeug.set60(fahrzeug.get60()+1);
 						überschuss.setAnzahlMeds(überschuss.getAnzahlMeds()-1);
 						frühBedarf.removeFirst();} 
@@ -722,11 +736,7 @@ public class Tourenplaner {
 				deckbarerBedarfVorhanden=true;
 				do {
 					try {
-					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
-						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung120().getNewInstance(), 120, frühBedarf.getFirst())) {
-							System.out.println("Badgegröße berücksichtigen!");
-							throw new IllegalArgumentException();
-						}
+					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {
 					fahrzeug.set120(fahrzeug.get120()+1);
 					überschuss.setAnzahlMeds(überschuss.getAnzahlMeds()-1);
 					frühBedarf.removeFirst();} 
@@ -785,10 +795,6 @@ public class Tourenplaner {
 				do {
 					try {
 					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
-						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung250().getNewInstance(), 250, frühBedarf.getFirst())) {
-							System.out.println("Badgegröße berücksichtigen!");
-							throw new IllegalArgumentException();
-						}
 					fahrzeug.set250(fahrzeug.get250()+1);
 					überschuss.setAnzahlMeds(überschuss.getAnzahlMeds()-1);
 					frühBedarf.removeFirst();} 
@@ -841,10 +847,6 @@ public class Tourenplaner {
 				do {
 					try {
 					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
-						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung500().getNewInstance(), 500, frühBedarf.getFirst())) {
-							System.out.println("Badgegröße berücksichtigen!");
-							throw new IllegalArgumentException();
-						}
 					fahrzeug.set500(fahrzeug.get500()+1);
 					überschuss.setAnzahlMeds(überschuss.getAnzahlMeds()-1);
 					frühBedarf.removeFirst();} 
@@ -878,7 +880,10 @@ public class Tourenplaner {
 		fahrzeug.setRückkehrZeit(endzeit.getNewInstance());
 		zeitkostenFahrt = zeitkostenFahrt + Time.getDifferenceInMinutes
 			(endzeit,fahrzeug.getStartzeitFahrt())*kostenProStundeFahrt;
-		return fahrzeug;
+		Object[] ergebnis = new Object[2];
+		ergebnis[0] = fahrzeug;
+		ergebnis[1] = überschuss;
+		return ergebnis;
 	}
 	
 	public int getGesamtkosten() {
@@ -905,8 +910,9 @@ public class Tourenplaner {
 		return route;
 	}
 
-	private Fahrzeug resteFahrzeugSchicken(String Stopp, MedUeberschuss überschuss) {
-		String[] list = routenplaner.getRoute().split(",");		
+	//private Fahrzeug resteFahrzeugSchicken(String Stopp, MedUeberschuss überschuss) {
+	private Object[] resteFahrzeugSchicken(String Stopp, MedUeberschuss überschuss) {	
+	String[] list = routenplaner.getRoute().split(",");		
 		int index = -1;
 	    for (int i = 0; (i < list.length) && (index == -1); i++) {
 	        if (list[i].equals(Stopp)) {
@@ -920,9 +926,7 @@ public class Tourenplaner {
 	    }
 	    System.out.println(strecke);
 	    
-	    Fahrzeug fahrzeug = this.neuesFahrzeugSchicken(strecke, überschuss);
-	    
-		return fahrzeug;
+		return this.neuesFahrzeugSchicken(strecke, überschuss);
 	}
 	
 	
