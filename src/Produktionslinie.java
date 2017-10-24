@@ -318,8 +318,6 @@ public class Produktionslinie {
 	public int getKosten(){
 		int dauer =0;
 		for(int i=0;i<belegtvon.size();i++){
-			System.out.println("ZEIIIIIIIITTTTESSSTTT");
-			System.out.println(Time.getDifferenceInMinutes(belegtvon.get(i), belegtbis.get(i)));
 			dauer += Time.getDifferenceInMinutes(belegtvon.get(i), belegtbis.get(i));
 		}
 		int kosten = (dauer/60)*1200; //1200 pro stunde
