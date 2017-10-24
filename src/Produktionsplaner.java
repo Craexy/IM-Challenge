@@ -525,11 +525,6 @@ public class Produktionsplaner {
 	
 	}
 	
-	public int calculateCostsForProductionLines(){
-		int nrOfProdLines = numberOfActiveProductionLines();
-		return nrOfProdLines*3000;
-	}
-	
 	public int calculateCostsForProductionTime(){
 		int costs = 0;
 		int nrOfProdLines = numberOfActiveProductionLines();
