@@ -543,10 +543,11 @@ public class Produktionsplaner {
 			int cost = produktionslinien.get(i).getKosten();
 			cost = cost+3000;
 			Map<Time, Integer> mengen = produktionslinien.get(i).getBelegtMitMenge();
+			int cost2= 0;
 			for(Time j : mengen.keySet()){
-				cost += mengen.get(j)*strafkosten;
+				cost2 += mengen.get(j)*strafkosten;
 			}
-			if(cost>strafkosten){
+			if(cost>cost2){
 				produktionslinien.get(i).removeAllProductions();
 			}
 		}
