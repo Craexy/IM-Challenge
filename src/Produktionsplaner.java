@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Produktionsplaner {
+	private int strafkosten;
 	
 	private LinkedList <Fahrzeug> fahrzeuge;
 	
@@ -22,8 +23,9 @@ public class Produktionsplaner {
 	private LinkedList <MedUeberschuss> medUeberschuesse;
 	
 	
-	public Produktionsplaner(LinkedList<Fahrzeug> fahrzeuge){
+	public Produktionsplaner(LinkedList<Fahrzeug> fahrzeuge, int strafkosten){
 		this.fahrzeuge = fahrzeuge;	
+		this.strafkosten = strafkosten;
 		
 		fahrzeugBedarfe = new LinkedList<LinkedList<Integer>>();
 		bedarfszeitpunkte = new LinkedList<LinkedList<Time>>();
@@ -40,6 +42,7 @@ public class Produktionsplaner {
 	public void planeProduktion(){
 		getNecessaryParameters();
 		assignProductionLines();
+		isItWorthIt();
 	}
 	
 	public void getNecessaryParameters(){
@@ -532,6 +535,21 @@ public class Produktionsplaner {
 			costs += produktionslinien.get(i).getKosten();
 		}
 		return costs;
+	}
+	
+	public void isItWorthIt(){
+		int nrOfProdLines = numberOfActiveProductionLines();
+		for(int i=1;i<=nrOfProdLines;i++){
+			int cost = produktionslinien.get(i).getKosten();
+			cost = cost+3000;
+			Map<Time, Integer> mengen = produktionslinien.get(i).getBelegtMitMenge();
+			for(Time j : mengen.keySet()){
+				cost += mengen.get(j)*strafkosten;
+			}
+			if(cost>strafkosten){
+				produktionslinien.get(i).removeAllProductions();
+			}
+		}
 	}
 	
 	public LinkedList<LinkedList<Integer>> getFahrzeugBedarfe() {

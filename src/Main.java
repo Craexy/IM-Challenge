@@ -10,7 +10,7 @@ public class Main {
 	Tourenplaner tourp = new Tourenplaner();
 	LinkedList<Fahrzeug> fahrzeuge = tourp.getFahrzeuge();
 	
-	Produktionsplaner produktp = new Produktionsplaner(fahrzeuge);
+	Produktionsplaner produktp = new Produktionsplaner(fahrzeuge, strafkostensatz);
 	MedUeberschuss[] ueberschuesse = new MedUeberschuss[produktp.getMedUeberschuesse().size()];
 	
 	int i = 0;
