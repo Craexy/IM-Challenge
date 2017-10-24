@@ -11,7 +11,6 @@ public class Lösung {
 	private int genutzteProduktionslinien;
 	
 	private List<Fahrzeug> fahrzeuge;
-	private List<Produktionslinie> produktionslinien;
 	
 	private String strecke;
 	
@@ -21,17 +20,15 @@ public class Lösung {
 		
 	}
 	
-	public Lösung(int distributionskostenZeit, int distributionskostenStrecke, int produktionskosten, int strafkosten, List<Fahrzeug> fahrzeuge, List<Produktionslinie> produktionslinien, String strecke) {
+	public Lösung(int distributionskostenZeit, int distributionskostenStrecke, int produktionskosten, int strafkosten, List<Fahrzeug> fahrzeuge, int anzahlProduktionslinien, String strecke) {
 		this.distributionskostenZeit = distributionskostenZeit;
 		this.distributionskostenStrecke = distributionskostenStrecke;
 		this.produktionskosten = produktionskosten;
 		this.fahrzeuge = fahrzeuge;
-		this.produktionslinien = produktionslinien;
+		this.genutzteProduktionslinien = anzahlProduktionslinien;
 		this.strecke = strecke;
 		this.strafkosten = strafkosten;
 		
-		//genutzteProduktionslinien = produktionslinien.size();
-		genutzteProduktionslinien = 2;
 		genutzteFahrzeuge = fahrzeuge.size();
 		
 		gesamtkosten = this.distributionskostenZeit + this.distributionskostenStrecke + this.produktionskosten + this.strafkosten
@@ -68,11 +65,11 @@ public class Lösung {
 	public void setFahrzeuge(List<Fahrzeug> fahrzeuge) {
 		this.fahrzeuge = fahrzeuge;
 	}
-	public List<Produktionslinie> getProduktionslinien() {
-		return produktionslinien;
+	public int getProduktionslinien() {
+		return genutzteProduktionslinien;
 	}
-	public void setProduktionslinien(List<Produktionslinie> produktionslinien) {
-		this.produktionslinien = produktionslinien;
+	public void setAnzahlProduktionslinien(int anzahlProduktionslinien) {
+		this.genutzteProduktionslinien = anzahlProduktionslinien;
 	}
 	
 	public String toString() {
