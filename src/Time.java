@@ -101,6 +101,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public static int getDifferenceInMinutes(Time zeit1, Time zeit2) {
+		//bisher nur für den Fall, dass maximal ein Tag Unterschied zwischen den Zeiten ist
 		int tempStunden = 0;
 		int tempMinuten = 0;
 		if (zeit1.tage-zeit2.tage==0) {

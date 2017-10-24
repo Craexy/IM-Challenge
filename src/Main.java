@@ -5,6 +5,8 @@ public class Main {
 	
 	
 	public static void main(String[] args) {
+	int strafkostensatz = 100;
+		
 	Tourenplaner tourp = new Tourenplaner();
 	LinkedList<Fahrzeug> fahrzeuge = tourp.getFahrzeuge();
 	
@@ -18,7 +20,7 @@ public class Main {
 	}
 	tourp.verteileReste(ueberschuesse);
 	
-	Lösung lösung = new Lösung(tourp.getZeitkostenFahrt(), tourp.getStreckenkostenFahrt(), produktp.calculateCostsForProductionTime(), tourp.getStrafkosten(), fahrzeuge, produktp.numberOfActiveProductionLines(), tourp.getStrecke());	
+	Lösung lösung = new Lösung(strafkostensatz, tourp.getZeitkostenFahrt(), tourp.getStreckenkostenFahrt(), produktp.calculateCostsForProductionTime(), tourp.getÜbrigeBedarfe(), fahrzeuge, produktp.numberOfActiveProductionLines(), tourp.getStrecke());	
 	System.out.println(lösung);
 	}
 
