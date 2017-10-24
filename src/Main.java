@@ -19,6 +19,7 @@ public class Main {
 	tourp.verteileReste(ueberschuesse);
 	
 	Lösung lösung = new Lösung(tourp.getZeitkostenFahrt(), tourp.getStreckenkostenFahrt(), 0, tourp.getStrafkosten(), fahrzeuge, null, tourp.getStrecke());	
+	System.out.println(lösung);
 	}
 
 
