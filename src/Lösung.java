@@ -6,9 +6,10 @@ public class Lösung {
 	private int distributionskostenZeit;
 	private int distributionskostenStrecke;
 	private int produktionskosten;
-	private int strafkosten;
+	private int anzahlÜbrigerBedarfe;
 	private int genutzteFahrzeuge;
 	private int genutzteProduktionslinien;
+	private int strafkostenSatz;
 	
 	private List<Fahrzeug> fahrzeuge;
 	
@@ -20,18 +21,19 @@ public class Lösung {
 		
 	}
 	
-	public Lösung(int distributionskostenZeit, int distributionskostenStrecke, int produktionskosten, int strafkosten, List<Fahrzeug> fahrzeuge, int anzahlProduktionslinien, String strecke) {
+	public Lösung(int strafkostensatz, int distributionskostenZeit, int distributionskostenStrecke, int produktionskosten, int anzahlÜbrigerBedarfe, List<Fahrzeug> fahrzeuge, int anzahlProduktionslinien, String strecke) {
 		this.distributionskostenZeit = distributionskostenZeit;
 		this.distributionskostenStrecke = distributionskostenStrecke;
 		this.produktionskosten = produktionskosten;
 		this.fahrzeuge = fahrzeuge;
 		this.genutzteProduktionslinien = anzahlProduktionslinien;
 		this.strecke = strecke;
-		this.strafkosten = strafkosten;
+		this.anzahlÜbrigerBedarfe = anzahlÜbrigerBedarfe;
+		this.strafkostenSatz=strafkostensatz;
 		
 		genutzteFahrzeuge = fahrzeuge.size();
 		
-		gesamtkosten = this.distributionskostenZeit + this.distributionskostenStrecke + this.produktionskosten + this.strafkosten
+		gesamtkosten = this.distributionskostenZeit + this.distributionskostenStrecke + this.produktionskosten + this.anzahlÜbrigerBedarfe
 				+ this.genutzteFahrzeuge*1000 + this.genutzteProduktionslinien*3000;
 	}
 	
@@ -59,6 +61,15 @@ public class Lösung {
 	public void setProduktionskosten(int produktionskosten) {
 		this.produktionskosten = produktionskosten;
 	}
+	
+	public int getStrafkostenSatz() {
+		return this.strafkostenSatz;
+	}
+	
+	public void setStrafkostenSatz(int strafkostenSatz) {
+		this.strafkostenSatz = strafkostenSatz;
+	}
+	
 	public List<Fahrzeug> getFahrzeuge() {
 		return fahrzeuge;
 	}
@@ -78,7 +89,7 @@ public class Lösung {
 				+" Es sind Gesamtkosten in Höhe von " + this.gesamtkosten + " entstanden."
 				+" Diese entfallen auf Produktionskosten(" + this.produktionskosten+") und Distributionskosten für Strecke("
 				+this.distributionskostenStrecke+") und Zeit("+this.distributionskostenZeit+") der Fahrten."
-				+" Zusätzlich fallen " + this.strafkosten + " an Strafkosten an.";
+				+" Zusätzlich fallen " + this.anzahlÜbrigerBedarfe*this.strafkostenSatz + " an Strafkosten an.";
 				
 	}
 

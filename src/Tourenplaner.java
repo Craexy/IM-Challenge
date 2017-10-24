@@ -892,7 +892,7 @@ public class Tourenplaner {
 	}
 	
 	public int getGesamtkosten() {
-		return getFahrkosten() + getStrafkosten() + fahrzeuge.size()*1000;
+		return getFahrkosten() + getÜbrigeBedarfe() + fahrzeuge.size()*1000;
 	}
 
 	public int getStreckenkostenFahrt() {
@@ -907,8 +907,8 @@ public class Tourenplaner {
 		return streckenkostenFahrt + zeitkostenFahrt;
 	}
 	
-	public int getStrafkosten() { 
-		return gesamtBedarf * strafkostensatz;
+	public int getÜbrigeBedarfe() { 
+		return gesamtBedarf;
 	}
 
 	public String getStrecke() {
