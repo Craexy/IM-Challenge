@@ -103,6 +103,7 @@ public class Time implements Comparable<Time>{
 	public static int getDifferenceInMinutes(Time zeit1, Time zeit2) {
 		int tempStunden = 0;
 		int tempMinuten = 0;
+		if (zeit1.tage-zeit2.tage==0) {
 		if (zeit1.compareTo(zeit2)==1) {
 			tempStunden = zeit1.getStunden()-zeit2.getStunden();
 			tempMinuten = zeit1.getMinuten()-zeit2.getMinuten();
@@ -120,6 +121,17 @@ public class Time implements Comparable<Time>{
 			}
 		} 
 		
-		return tempStunden*60+tempMinuten;
+		return tempStunden*60+tempMinuten;}
+		if (Math.abs(zeit1.tage-zeit2.tage)==1) {
+			int minuten = 0;
+			if (zeit1.tage!=0) {
+				minuten = Time.getDifferenceInMinutes(zeit1, new Time(24,0,-1)) + Time.getDifferenceInMinutes(zeit2, new Time(0,0,0));
+			}
+			if (zeit2.tage!=0) {
+				minuten = Time.getDifferenceInMinutes(zeit2, new Time(24,0,-1)) + Time.getDifferenceInMinutes(zeit1, new Time(0,0,0));	
+			}
+		return minuten;
+		}
+		return 0;
 	}
 }

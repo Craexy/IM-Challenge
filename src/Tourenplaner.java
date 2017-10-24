@@ -573,7 +573,6 @@ public class Tourenplaner {
 		return fahrzeug;
 	}
 
-	//private Fahrzeug neuesFahrzeugSchicken(String strecke, MedUeberschuss überschuss) {
 	private Object[] neuesFahrzeugSchicken(String strecke, MedUeberschuss überschuss){
 		String tempStrecke = strecke;
 		strecke="";
@@ -581,6 +580,12 @@ public class Tourenplaner {
 			if (!bedarfe.get(tempStrecke.split(",")[i]).isEmpty()) {
 				strecke = strecke+tempStrecke.split(",")[i]+",";
 			}
+		}
+		if (strecke.equals("")) {
+			Object[] temp = new Object[2];
+			temp[0]=null;
+			temp[1]=überschuss;
+			return temp;
 		}
 		
 		
