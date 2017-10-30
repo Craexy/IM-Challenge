@@ -77,6 +77,9 @@ public class Routenplaner {
 	
 	
 	public void simmulatedAnnealing(){
+		//Wähle die Variante der Distanzfunktion: Zeit=1/Strecke=2
+		int variante = 1;
+		
 		// Set initial temp
         double temp = 10000;
 
@@ -95,7 +98,7 @@ public class Routenplaner {
             // Create new neighbour tour
             Tour newSolution = new Tour(currentSolution.getTour());
 
-            // Get a random positions in the tour
+            // Get two random positions in the tour
             int tourPos1 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
             int tourPos2 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
 
@@ -108,8 +111,8 @@ public class Routenplaner {
             newSolution.setCity(tourPos1, citySwap2);
             
             // Get energy of solutions
-            int currentEnergy = currentSolution.getDistance();
-            int neighbourEnergy = newSolution.getDistance();
+            int currentEnergy = currentSolution.getDistance(variante);
+            int neighbourEnergy = newSolution.getDistance(variante);
 
             // Decide if we should accept the neighbour
             if (acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) {
@@ -117,7 +120,7 @@ public class Routenplaner {
             }
 
             // Keep track of the best solution found
-            if (currentSolution.getDistance() < best.getDistance()) {
+            if (currentSolution.getDistance(variante) < best.getDistance(variante)) {
                 best = new Tour(currentSolution.getTour());
             }
             
@@ -125,7 +128,7 @@ public class Routenplaner {
             temp *= 1-coolingRate;
         }
         this.best = best.getTour();
-        tourLaenge = best.getDistance();
+        tourLaenge = best.getDistance(variante);
 	}
 	
 

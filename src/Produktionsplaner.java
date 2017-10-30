@@ -547,6 +547,9 @@ public class Produktionsplaner {
 			for(Time j : mengen.keySet()){
 				cost2 += mengen.get(j)*strafkosten;
 			}
+			System.out.println(mengen);
+			System.out.println(cost);
+			System.out.println(cost2);
 			if(cost>cost2){
 				produktionslinien.get(i).removeAllProductions();
 			}

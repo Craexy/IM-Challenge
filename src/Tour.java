@@ -52,28 +52,59 @@ public class Tour {
         return tour.size();
     }
     
-    public int getDistance(){
-        if (distance == 0) {
-            int tourDistance = 0;
-            // Loop through our tour's cities
-            for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
-                // Get city we're traveling from
-                String fromCity = getCity(cityIndex);
-                // City we're traveling to
-                String destinationCity;
-                // Check we're not on our tour's last city, if we are set our 
-                // tour's final destination city to our starting city
-                if(cityIndex+1 < tourSize()){
-                    destinationCity = getCity(cityIndex+1);
+    public int getDistance(int variante){
+    	switch(variante){
+    	case 1:
+    		if (distance == 0) {
+                int tourDistance = 0;
+                // Loop through our tour's cities
+                for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
+                    // Get city we're traveling from
+                    String fromCity = getCity(cityIndex);
+                    // City we're traveling to
+                    String destinationCity;
+                    // Check we're not on our tour's last city, if we are set our 
+                    // tour's final destination city to our starting city
+                    if(cityIndex+1 < tourSize()){
+                        destinationCity = getCity(cityIndex+1);
+                    }
+                    else{
+                        destinationCity = getCity(0);
+                    }
+                    // Get the distance between the two cities
+                    tourDistance += Routenplaner.getFahrtzeit(fromCity,destinationCity);
                 }
-                else{
-                    destinationCity = getCity(0);
-                }
-                // Get the distance between the two cities
-                tourDistance += Routenplaner.getFahrtzeit(fromCity,destinationCity);
+                distance = tourDistance;
             }
-            distance = tourDistance;
-        }
-        return distance;
+            return distance;
+            
+    	case 2:
+    		if (distance == 0) {
+                int tourDistance = 0;
+                // Loop through our tour's cities
+                for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
+                    // Get city we're traveling from
+                    String fromCity = getCity(cityIndex);
+                    // City we're traveling to
+                    String destinationCity;
+                    // Check we're not on our tour's last city, if we are set our 
+                    // tour's final destination city to our starting city
+                    if(cityIndex+1 < tourSize()){
+                        destinationCity = getCity(cityIndex+1);
+                    }
+                    else{
+                        destinationCity = getCity(0);
+                    }
+                    // Get the distance between the two cities
+                    tourDistance += Routenplaner.getFahrstrecke(fromCity,destinationCity);
+                }
+                distance = tourDistance;
+            }
+            return distance;
+    	default:System.out.println("Es wurde keine Variante festgelegt!"); 
+    			return distance;
+    	}
+    	
+        
     }
 }
