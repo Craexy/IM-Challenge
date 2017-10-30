@@ -42,7 +42,7 @@ public class Produktionsplaner {
 	public void planeProduktion(){
 		getNecessaryParameters();
 		assignProductionLines();
-		isItWorthIt();
+		//isItWorthIt();
 	}
 	
 	public void getNecessaryParameters(){
