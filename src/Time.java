@@ -15,7 +15,6 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public Time reduceTime(int Minuten) throws IllegalArgumentException{
-		//@TODO: Algorithmus korrigieren 
 		if (Minuten<0) throw new IllegalArgumentException();
 		if (this.minuten>=Minuten) this.minuten = this.minuten - Minuten; 
 		else {

@@ -42,6 +42,13 @@ public class MedUeberschuss {
 		System.out.println("Dieser MedUeberschuss wurde erzeugt: "+medTyp+"  "+anzahlMeds+"   "+this.startProduktion);
 	}
 	
+	public MedUeberschuss getNewInstance() {
+		LinkedList<Integer> temp = new LinkedList<Integer>();
+		temp.addFirst(medTyp);
+		temp.addLast(anzahlMeds);
+		return new MedUeberschuss(temp, this.startProduktion);
+	}
+	
 	public int getMedTyp() {
 		return medTyp;
 	}

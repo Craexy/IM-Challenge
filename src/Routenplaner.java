@@ -1,10 +1,5 @@
 import org.graphstream.graph.implementations.*;
-
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
-
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -14,12 +9,13 @@ public class Routenplaner {
 	
 
 	private String route;
-	private static Graph g1 = new DefaultGraph("Fahrtzeiten");
+	private static Graph g1;
 	private LinkedList<String> best = new LinkedList<String>();
 	private int tourLaenge;
 	
 
 	public Routenplaner(){
+		g1 =  new DefaultGraph("Fahrtzeiten");
 		erzeugeDaten();
 		planeRoute();
 	}
@@ -145,7 +141,7 @@ public class Routenplaner {
     
     
     
-private void erzeugeDaten() {
+    private void erzeugeDaten() {
 		
 		
 		Node A = g1.addNode("A");		
@@ -250,14 +246,9 @@ private void erzeugeDaten() {
 		Edge GH = g1.addEdge("GH", G, H);
 			GH.addAttribute("Fahrtzeit", 45);
 			GH.addAttribute("Fahrstrecke", 34);
-			
-			
-		
-		
-		//g1.display();
-		
 
 	}
+
 
 	
 }

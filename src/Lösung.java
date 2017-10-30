@@ -34,7 +34,7 @@ public class Lösung {
 		genutzteFahrzeuge = fahrzeuge.size();
 		
 		gesamtkosten = this.distributionskostenZeit + this.distributionskostenStrecke + this.produktionskosten + this.anzahlÜbrigerBedarfe
-				+ this.genutzteFahrzeuge*1000 + this.genutzteProduktionslinien*3000;
+				+ this.genutzteFahrzeuge*1000 + this.genutzteProduktionslinien*3000 + this.anzahlÜbrigerBedarfe*this.strafkostenSatz;
 	}
 	
 	public int getGesamtkosten() {
@@ -70,6 +70,10 @@ public class Lösung {
 		this.strafkostenSatz = strafkostenSatz;
 	}
 	
+	public String getStrecke() {
+		return this.strecke;
+	}
+	
 	public List<Fahrzeug> getFahrzeuge() {
 		return fahrzeuge;
 	}
@@ -89,7 +93,8 @@ public class Lösung {
 				+" Es sind Gesamtkosten in Höhe von " + this.gesamtkosten + " entstanden."
 				+" Diese entfallen auf Produktionskosten(" + this.produktionskosten+") und Distributionskosten für Strecke("
 				+this.distributionskostenStrecke+") und Zeit("+this.distributionskostenZeit+") der Fahrten."
-				+" Zusätzlich fallen " + this.anzahlÜbrigerBedarfe*this.strafkostenSatz + " an Strafkosten an.";
+				+" Zusätzlich fallen " + this.anzahlÜbrigerBedarfe*this.strafkostenSatz + " an Strafkosten an da "
+				+this.anzahlÜbrigerBedarfe+" Bedarfe nicht gedeckt wurden.";
 				
 	}
 

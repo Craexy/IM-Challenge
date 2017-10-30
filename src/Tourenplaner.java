@@ -15,13 +15,13 @@ public class Tourenplaner {
 	private int genutzteFahrzeuge = 0;
 	private int streckenkostenFahrt = 0;
 	private int zeitkostenFahrt = 0;
-	
-	private int strafkostensatz = 100;
 	private int kostenProMeile = 5;
 	private int kostenProStundeFahrt = 10;
+	private int strafkostensatz;
 	
 	private int gesamtBedarf = 0;
 	
+	//Bedarfe nach Standorten
 	private Map<String, LinkedList<Time>> bedarfe = new HashMap<String, LinkedList<Time>>();
 	private LinkedList<Time> bedarfA = new LinkedList<Time>();
 	private LinkedList<Time> bedarfB = new LinkedList<Time>();
@@ -32,6 +32,7 @@ public class Tourenplaner {
 	private LinkedList<Time> bedarfG = new LinkedList<Time>();
 	private LinkedList<Time> bedarfH = new LinkedList<Time>();
 	
+	//Entladezeiten der Standorte
 	private Map<String, Integer> entladezeiten = new HashMap<String, Integer>();
 	private int entladezeitA = 15;
 	private int entladezeitB = 30;
@@ -42,32 +43,30 @@ public class Tourenplaner {
 	private int entladezeitG = 30;
 	private int entladezeitH = 15;
 	
-	//Minuten nach Produktion, ab denen Medikament60 benutzt werden kann 
-	private int startNutzMed60 = 270;
-	//Minuten nach Produktion, bis zu denen Medikament60 benutzt werden kann 
+	//startNutzMed60: Minuten nach Produktion, ab denen Medikament60 benutzt werden kann 
+	//endNutzMed60: Minuten nach Produktion, bis zu denen Medikament60 benutzt werden kann 
 	//minus 30, da die Medikamente 30 Minuten vor Benutzung vorliegen müssen
 	//--> es stehen also 30 Minuten weniger zur Entladung zur Verfügung
+	private int startNutzMed60 = 270;
 	private int endNutzMed60 = 450-30;
-	private int dauerNutzMed60 = endNutzMed60-startNutzMed60;
 	
 	private int startNutzMed120 = 390;
 	private int endNutzMed120 = 600-30;
-	private int dauerNutzMed120 = endNutzMed120 - startNutzMed120;
 
 	private int startNutzMed250 = 540;
 	private int endNutzMed250 = 720-30;
-	private int dauerNutzMed250 = endNutzMed250 - startNutzMed250;
 
 	private int startNutzMed500 = 660;
 	private int endNutzMed500 = 840-30;
-	private int dauerNutzMed500 = endNutzMed500 - startNutzMed500;
 	
-	public Tourenplaner() {
+	public Tourenplaner(int strafkostensatz, int variante) {
 		routenplaner = new Routenplaner();
 		route = routenplaner.getRoute();
-		
+		this.strafkostensatz = strafkostensatz;
 		fahrzeuge = new LinkedList<Fahrzeug>();
 		
+		//Die Listen der Bedarfe der einzelnen Standorte werden in einer Map gespeichert um dynamischen 
+		//Zugriff zu ermöglichen
 		bedarfe.put("A", bedarfA);
 		bedarfe.put("B", bedarfB);
 		bedarfe.put("C", bedarfC);
@@ -77,6 +76,7 @@ public class Tourenplaner {
 		bedarfe.put("G", bedarfG);
 		bedarfe.put("H", bedarfH);
 		
+		//gleiches Verfahren wie bei Bedarfe (s.o.)
 		entladezeiten.put("A", entladezeitA);
 		entladezeiten.put("B", entladezeitB);
 		entladezeiten.put("C", entladezeitC);
@@ -88,17 +88,18 @@ public class Tourenplaner {
 		
 		//Daten mit Uhrzeiten der Bedarfe werden eingelesen
 		this.befülleDaten();
-	    //Variante 1
-	    
-		System.out.println("+++   Variante 1   +++");
-		this.variante1();
-		
-		System.out.println("Gesamtkosten betragen: "+getGesamtkosten());
+	   
+		//Variante 1
+		if (variante==1) {
+			System.out.println("+++   Variante 1   +++");
+			this.variante1();
+			System.out.println("Gesamtkosten betragen: "+getGesamtkosten());}
 
 		//Variante 2
-		/*System.out.println("+++   Variante 2   +++");
-		this.befülleDaten();
-		this.variante2();*/
+		if (variante==2) {
+			System.out.println("+++   Variante 2   +++");
+			this.befülleDaten();
+			this.variante2();}
 
 	}
 	
@@ -155,46 +156,52 @@ public class Tourenplaner {
 	
 	private void variante1(){
 		//erstes Fahrzeug fährt optimierte Route
-				Fahrzeug fahrzeug1  = this.neuesFahrzeugSchicken(route);
-				fahrzeuge.add(fahrzeug1);
-				//zweites Fahrzeug fährt umgekehrte Route
-				String strecke2 = "";
-			    for (int i=0; i<7; i++) {
-			    	strecke2 = strecke2+routenplaner.getRoute().split(",")[7-i]+",";
-			    	}
-			    Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
-			    fahrzeuge.add(fahrzeug2);
+		Fahrzeug fahrzeug1  = this.neuesFahrzeugSchicken(route);
+		fahrzeuge.add(fahrzeug1);
+		
+		//zweites Fahrzeug fährt umgekehrte Route
+		String strecke2 = "";
+		for (int i=0; i<7; i++) {
+			strecke2 = strecke2+routenplaner.getRoute().split(",")[7-i]+",";
+			}
+		Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
+		fahrzeuge.add(fahrzeug2);
 	}
 	
+	@SuppressWarnings("unused")
 	private void variante2() {
+		//erstes Auto fährt erste Hälfte der Strecke
 		String strecke1 = "";
 		for(int i=0;i<4;i++) {
 			if(i<3) {
-		strecke1 = strecke1 +routenplaner.getRoute().split(",")[i]+ ",";}
-			else strecke1 = strecke1 +routenplaner.getRoute().split(",")[i];
-		}
+					strecke1 = strecke1 +routenplaner.getRoute().split(",")[i]+ ",";}
+					else strecke1 = strecke1 +routenplaner.getRoute().split(",")[i];
+			}
 		System.out.println(strecke1);
 		fahrzeuge.add(this.neuesFahrzeugSchicken(strecke1));
 		
+		//zweites Auto fährt zweite Hälfte der Strecke
 		String strecke2 = "";
 		for(int i=4;i<8;i++) {
 			if(i<7) {
-		strecke2 = strecke2 +routenplaner.getRoute().split(",")[i]+ ",";
-			} else strecke2 = strecke2 +routenplaner.getRoute().split(",")[i];
+					strecke2 = strecke2 +routenplaner.getRoute().split(",")[i]+ ",";} 
+					else strecke2 = strecke2 +routenplaner.getRoute().split(",")[i];
 			}
 		System.out.println(strecke2);
 		Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
 		fahrzeuge.add(fahrzeug2);
 	}
 	
+	//Array von Überschüssen wird einzeln verteilt
 	public void verteileReste(MedUeberschuss[] überschüsse) {
 		for (int i=0;i<überschüsse.length;i++) {
 			this.verteileReste(überschüsse[i]);
 		}
 	}
 	
+	//Mit Medikamenten, die bei Produktion überproduziert wurden,
+	//wird versucht noch offene Bedarfe mit neuen (oder sogar alten) Fahrzeugen zu decken
 	public void verteileReste(MedUeberschuss überschuss) {
-		//@TODO: statt neuem Auto prüfen, ob benutztes Auto wiederverwendet werden kann
 		Time startNutzung = null;
 		Time endNutzung = null;
 		LinkedList<Time> aktuellerBedarf;
@@ -202,6 +209,7 @@ public class Tourenplaner {
 		//Map mit allen möglichen, deckbaren Bedarfen
 		Map<String, Integer> deckbareBedarfe = new HashMap<String,Integer>();
 		
+		//Je nach Typ des Medikaments das überproduziert wurde, sind andere Nutzungszeiten zu beachten
 		if (überschuss.getMedTyp()==60) {
 			startNutzung = überschuss.getStartProduktion().getNewInstance().addTime(startNutzMed60);
 			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed60);
@@ -222,13 +230,14 @@ public class Tourenplaner {
 			endNutzung = startNutzung.getNewInstance().addTime(endNutzMed500);
 		}
 		
+		//Bedarfe, die augfgrund der Nutzungszeit von Überschuss gedeckt werden könnten, werden ermittelt
 		for (Entry<String, LinkedList<Time>> e : bedarfe.entrySet()){
 			aktuellerBedarf = (LinkedList<Time>)e.getValue();
 			//Deckbarer Bedarf in aktuell betrachtetem Standort
 			int lokalDeckbareBedarfe = 0;
 			for (int j=0;j<aktuellerBedarf.size();j++) {
 				if (aktuellerBedarf.get(j).isLaterThan(startNutzung.getNewInstance().reduceTime(1))
-						&&aktuellerBedarf.get(j).isEarlierThan(endNutzung.getNewInstance().reduceTime(1))) {
+					&&aktuellerBedarf.get(j).isEarlierThan(endNutzung.getNewInstance().reduceTime(1))) {
 					lokalDeckbareBedarfe = lokalDeckbareBedarfe + 1;	
 				}
 			deckbareBedarfe.put(e.getKey(), lokalDeckbareBedarfe);
@@ -236,7 +245,8 @@ public class Tourenplaner {
 			
 		}
 		
-		
+		//Standort, an dem die meisten Bedarfe durch Überschuss gedeckt werden können wird ermittelt
+		//Dieser wird zuerst angefahren
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
@@ -245,6 +255,7 @@ public class Tourenplaner {
 			System.out.println(e.getValue()+" Bedarfe in Standort "+e.getKey()+" abdeckbar.");
 		}
 		
+		//Wenn an keinem Standort Bedarfe gedeckt werden können wird kein neues Fahrzeug losgeschickt
 		if (anzufahrenderOrt.equals("")) {
 			System.out.println("Rest nicht verteilbar.");
 			return;
@@ -256,22 +267,43 @@ public class Tourenplaner {
 		
 		//prüfen ob einzelnes Decken verbleibender Bedarfe billiger als Strafkosten ist
 		
-		//Zeiten für Bedarf A ausgeben und zwischenspeichern
-		//Fahrzeug für Standort A losschicken mit Überschuss
+		//Zeiten für Bedarf "i" ausgeben und zwischenspeichern
+		//Fahrzeug für Standort "i" losschicken mit vorhandenem Überschuss
 		//Kosten des neuen Fahrzeugs berechenen und mit Strafkosten vergleichen
 		//Wenn Strafkosten geringer: Bedarf wiederherstellen und Fahrzeug löschen
+		//Wenn Strafkosten höher: Fahrzeugen zu Fahrzeugen hinzufügen
+		
+		String[] buchstaben = new String[8];
+		buchstaben = "A,B,C,D,E,F,G,H".split(",");
 		
 		LinkedList<Time> betrachteterBedarf = new LinkedList<Time>();
-		betrachteterBedarf.addAll(bedarfA);
-		Object[] optional = neuesFahrzeugSchicken("A", (MedUeberschuss)temp[1]);
-		System.out.println("");
-		
+		Object[] optional;
+		int fahrzeugKosten;
+		int altStrafkosten;
+		for (int i=0;i<8;i++) {
+		betrachteterBedarf.addAll(bedarfe.get(buchstaben[i]));
+		optional = neuesFahrzeugSchicken(buchstaben[i], ((MedUeberschuss)temp[1]).getNewInstance());
+		//Kosten wenn Fahrzeug genutzt wird
+		fahrzeugKosten = 1000 + Routenplaner.getFahrstrecke("A", buchstaben[i])*5 + Routenplaner.getFahrtzeit("A", buchstaben[i])*10;
+		//Kosten wenn Fahrzeug nicht geschickt wird und stattdessen Strafkosten in Kauf genommen werden
+		try {
+			altStrafkosten = (((Fahrzeug) optional[0]).get60()+ ((Fahrzeug) optional[0]).get120()+ ((Fahrzeug) optional[0]).get250()+ ((Fahrzeug) optional[0]).get500())*strafkostensatz;	
+		if (fahrzeugKosten<altStrafkosten) {
+			temp = optional;
+			fahrzeuge.add((Fahrzeug)optional[0]);
+			}
+		else {
+			bedarfe.get(buchstaben[i]).addAll(betrachteterBedarf);
+			} 
+		}
+		catch (NullPointerException e) {
+			System.out.println("Bedarf "+buchstaben[i]+" bereits gedeckt.");
+			}
+		}
 		
 	}
 
 	private Fahrzeug neuesFahrzeugSchicken(String strecke) {
-		//@TODO: Funktion schreiben, um optimale Strecke zu finden, wenn Knoten removed wurde
-		
 		String tempStrecke = strecke;
 		strecke="";
 		for (int i=0;i<tempStrecke.split(",").length;i++) {
@@ -279,15 +311,8 @@ public class Tourenplaner {
 				strecke = strecke+tempStrecke.split(",")[i]+",";
 			}
 		}
-		
-		
-		
-		//Zeit zu der das Fahrzeug wieder zurück im Depot ist
+		//Zeit zu der das Fahrzeug wieder zurück im Depot ist --> wird später befüllt
 		Time endzeit = new Time(0,0,0);
-		
-		genutzteFahrzeuge = genutzteFahrzeuge +1;
-		System.out.println("Neues Fahrzeug startet");
-		
 		
 		//Streckenkosten dieser Fahrt berechnen
 		//Kosten für Fahrt von Anfang bis Ende
@@ -303,6 +328,8 @@ public class Tourenplaner {
 		Time ersterBedarf = bedarfe.get(strecke.split(",")[0]).getFirst().getNewInstance();
 		int fahrtzeit = Routenplaner.getFahrtzeit("A", strecke.split(",")[0]);
 	    Time zeitpunktAktuell = ersterBedarf.getNewInstance().reduceTime(fahrtzeit);
+	    
+	    //Wenn zurückgekehrtes Fahrzeug im Depot steht wird dieses genutzt
 	    if (!fahrzeuge.isEmpty()) {
 	    	for (Fahrzeug e:fahrzeuge) {
 	    		if (e.getRückkehrZeit()!=null) {
@@ -314,6 +341,7 @@ public class Tourenplaner {
 	    			}
 	    		}
 	    	}
+	    //wenn kein zurückgekehrtes Fahrzeug im Depot steht wir ein neues losgeschickt
 	    } else {
 	    fahrzeug = new Fahrzeug();
 	    genutzteFahrzeuge = genutzteFahrzeuge +1;
@@ -362,10 +390,10 @@ public class Tourenplaner {
 				do {
 					try {
 					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell.getNewInstance().reduceTime(1))) {	
-//						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung60().getNewInstance(), 60, frühBedarf.getFirst())) {
-//							System.out.println("Badgegröße berücksichtigen!");
-//							throw new IllegalArgumentException();
-//						}
+						/*if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung60().getNewInstance(), 60, frühBedarf.getFirst())) {
+							System.out.println("Badgegröße berücksichtigen!");
+							throw new IllegalArgumentException();
+						}*/
 					fahrzeug.set60(fahrzeug.get60()+1);
 					frühBedarf.removeFirst();} 
 					else deckbarerBedarfVorhanden = false;}
@@ -425,10 +453,10 @@ public class Tourenplaner {
 				do {
 					try {
 					if (frühBedarf.getFirst().isLaterThan(zeitpunktAktuell)) {	
-//						if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung120().getNewInstance(),120, frühBedarf.getFirst())) {
-//							System.out.println("Badgegröße berücksichtigen!");
-//							throw new IllegalArgumentException();
-//						}
+						/*if (!checkBadgeGroeße(fahrzeug.getStartzeitBeladung120().getNewInstance(),120, frühBedarf.getFirst())) {
+							System.out.println("Badgegröße berücksichtigen!");
+							throw new IllegalArgumentException();
+						}*/
 					fahrzeug.set120(fahrzeug.get120()+1);
 					frühBedarf.removeFirst();} 
 					else deckbarerBedarfVorhanden = false;}
@@ -554,14 +582,14 @@ public class Tourenplaner {
 	    }
 
 	    
-		System.out.println("Bedarf A benötigt "+bedarfA.size()+" weitere Medikamente");
-		System.out.println("Bedarf B benötigt "+bedarfB.size()+" weitere Medikamente");
-		System.out.println("Bedarf C benötigt "+bedarfC.size()+" weitere Medikamente");
-		System.out.println("Bedarf D benötigt "+bedarfD.size()+" weitere Medikamente");
-		System.out.println("Bedarf E benötigt "+bedarfE.size()+" weitere Medikamente");
-		System.out.println("Bedarf F benötigt "+bedarfF.size()+" weitere Medikamente");
-		System.out.println("Bedarf G benötigt "+bedarfG.size()+" weitere Medikamente");
-		System.out.println("Bedarf H benötigt "+bedarfH.size()+" weitere Medikamente");
+		System.out.println("Standort A benötigt "+bedarfA.size()+" weitere Medikamente");
+		System.out.println("Standort B benötigt "+bedarfB.size()+" weitere Medikamente");
+		System.out.println("Standort C benötigt "+bedarfC.size()+" weitere Medikamente");
+		System.out.println("Standort D benötigt "+bedarfD.size()+" weitere Medikamente");
+		System.out.println("Standort E benötigt "+bedarfE.size()+" weitere Medikamente");
+		System.out.println("Standort F benötigt "+bedarfF.size()+" weitere Medikamente");
+		System.out.println("Standort G benötigt "+bedarfG.size()+" weitere Medikamente");
+		System.out.println("Standort H benötigt "+bedarfH.size()+" weitere Medikamente");
 		int gesamtBedarf = bedarfA.size()+bedarfB.size()+bedarfC.size()+bedarfD.size()+bedarfE.size()+bedarfF.size()+bedarfG.size()+bedarfH.size();
 		System.out.println("Insgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
 		
@@ -939,6 +967,7 @@ public class Tourenplaner {
 	//Falls zwei Badges notwendig sind um einen Medikamentenbedarf zu decken, wird geprüft
 	//ob dies möglich ist, obwohl der zweite Badge (aufgrund der neuerlichen Produktionsdauer)
 	//erst gewisse Zeit später zur Verfügung steht
+	@SuppressWarnings("unused")
 	private boolean checkBadgeGroeße(Time produktionsende, int medTyp, Time bedarf) {
 		switch (medTyp){
 			case 60:{
@@ -968,5 +997,6 @@ public class Tourenplaner {
 	public LinkedList<Fahrzeug> getFahrzeuge(){
 		return fahrzeuge;
 	}
+
 
 }
