@@ -88,7 +88,7 @@ public class Time implements Comparable<Time>{
 	}
 	
 	public String toString() {
-		if (this.tage<0) return ""+this.stunden+":"+this.minuten+" --> "+this.tage*-1+" Tag(e) vorher.";
+		if (this.tage<0) return ""+this.stunden+":"+this.minuten+" ("+this.tage*-1+" Tag(e) vorher)";
 		else return ""+this.stunden+":"+this.minuten;
 	}
 

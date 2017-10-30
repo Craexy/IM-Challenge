@@ -91,9 +91,9 @@ public class Lösung {
 		return "Insgesamt wurden " + this.genutzteFahrzeuge + " Fahrzeuge verwendet."
 				+" Es wurden " + this.genutzteProduktionslinien + " Produktionslinien genutzt."
 				+" Es sind Gesamtkosten in Höhe von " + this.gesamtkosten + " entstanden."
-				+" Diese entfallen auf Produktionskosten(" + this.produktionskosten+") und Distributionskosten für Strecke("
+				+"\nDiese entfallen auf Produktionskosten(" + this.produktionskosten+") und Distributionskosten für Strecke("
 				+this.distributionskostenStrecke+") und Zeit("+this.distributionskostenZeit+") der Fahrten."
-				+" Zusätzlich fallen " + this.anzahlÜbrigerBedarfe*this.strafkostenSatz + " an Strafkosten an da "
+				+"\nZusätzlich fallen " + this.anzahlÜbrigerBedarfe*this.strafkostenSatz + " an Strafkosten an da "
 				+this.anzahlÜbrigerBedarfe+" Bedarfe nicht gedeckt wurden.";
 				
 	}

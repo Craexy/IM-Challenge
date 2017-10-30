@@ -168,7 +168,6 @@ public class Tourenplaner {
 		fahrzeuge.add(fahrzeug2);
 	}
 	
-	@SuppressWarnings("unused")
 	private void variante2() {
 		//erstes Auto fährt erste Hälfte der Strecke
 		String strecke1 = "";
@@ -177,7 +176,6 @@ public class Tourenplaner {
 					strecke1 = strecke1 +routenplaner.getRoute().split(",")[i]+ ",";}
 					else strecke1 = strecke1 +routenplaner.getRoute().split(",")[i];
 			}
-		System.out.println(strecke1);
 		fahrzeuge.add(this.neuesFahrzeugSchicken(strecke1));
 		
 		//zweites Auto fährt zweite Hälfte der Strecke
@@ -187,7 +185,6 @@ public class Tourenplaner {
 					strecke2 = strecke2 +routenplaner.getRoute().split(",")[i]+ ",";} 
 					else strecke2 = strecke2 +routenplaner.getRoute().split(",")[i];
 			}
-		System.out.println(strecke2);
 		Fahrzeug fahrzeug2 = this.neuesFahrzeugSchicken(strecke2);
 		fahrzeuge.add(fahrzeug2);
 	}
@@ -247,20 +244,21 @@ public class Tourenplaner {
 		
 		//Standort, an dem die meisten Bedarfe durch Überschuss gedeckt werden können wird ermittelt
 		//Dieser wird zuerst angefahren
+		System.out.println("Überschuss wird geprüft.");
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
 			if (e.getValue()>lokalDeckbareBedarfe) { anzufahrenderOrt = e.getKey();
 			lokalDeckbareBedarfe = e.getValue();}
-			System.out.println(e.getValue()+" Bedarfe in Standort "+e.getKey()+" abdeckbar.");
+			if (e.getValue()!=0) System.out.println("\t"+e.getValue()+" Bedarfe in Standort "+e.getKey()+" abdeckbar.");
 		}
 		
 		//Wenn an keinem Standort Bedarfe gedeckt werden können wird kein neues Fahrzeug losgeschickt
 		if (anzufahrenderOrt.equals("")) {
-			System.out.println("Rest nicht verteilbar.");
+			System.out.println("\n\tKeine Bedarfe abdeckbar");
 			return;
 		}
-		System.out.println("Ort "+anzufahrenderOrt+" wird zuerst angefahren.");
+		System.out.println("\tOrt "+anzufahrenderOrt+" wird zuerst angefahren.");
 		//Nach dem Versuch übrig bleibende Bedarfe zu decken wird der restliche Überschuss wieder zurückgegeben
 		Object[] temp = this.resteFahrzeugSchicken(anzufahrenderOrt, überschuss);
 		fahrzeuge.add((Fahrzeug)temp[0]);
@@ -335,8 +333,8 @@ public class Tourenplaner {
 	    		if (e.getRückkehrZeit()!=null) {
 	    			if (zeitpunktAktuell.isLaterThan(e.getRückkehrZeit())) {
 	    				fahrzeug = new Fahrzeug();
-	    				System.out.println("Altes Fahrzeug startet");
-	    			    fahrzeug.setStrecke(strecke);
+	    				fahrzeug.setStrecke(strecke);
+	    				System.out.println("Altes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    			    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance());
 	    			}
 	    		}
@@ -345,14 +343,14 @@ public class Tourenplaner {
 	    } else {
 	    fahrzeug = new Fahrzeug();
 	    genutzteFahrzeuge = genutzteFahrzeuge +1;
-		System.out.println("Neues Fahrzeug startet");
 	    fahrzeug.setStrecke(strecke);
+	    System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); }
 	    if (fahrzeug==null) {
 	    	fahrzeug = new Fahrzeug();
 		    genutzteFahrzeuge = genutzteFahrzeuge +1;
-			System.out.println("Neues Fahrzeug startet");
 		    fahrzeug.setStrecke(strecke);
+			System.out.println("Neues Fahrzeug startet auf der Strecke "+fahrzeug.getStrecke());
 		    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); 
 	    }
 
@@ -406,8 +404,9 @@ public class Tourenplaner {
 					endzeit = zeitpunktAktuell.getNewInstance().addTime(Routenplaner.getFahrtzeit(aktuellerStopp, "A"));
 				}
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get60()+" Einheiten von Med60 abgeliefert.");
-			}
+				}
+	    System.out.println("\tDas Fahrzeug hat insgesamt "+fahrzeug.get60()+" Einheiten von Med60 abgeliefert.");
+		
 	    
 	    LinkedList<Time> bedarfAnErstemStopp = new LinkedList<Time>();
 
@@ -466,8 +465,9 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
-			}
+				}
+	    System.out.println("\tDas Fahrzeug hat insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
+		
 	    
 	    Time start250 = null;
 	    for (int i = 0; i<8; i++) {
@@ -524,9 +524,9 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get250()+" Einheiten von Med250 abgeliefert.");
-			}
-	    
+				}
+	    System.out.println("\tDas Fahrzeug hat insgesamt "+fahrzeug.get250()+" Einheiten von Med250 abgeliefert.");
+		
 	    bedarfAnErstemStopp = new LinkedList<Time>();
 	    bedarfAnErstemStopp = bedarfe.get(strecke.split(",")[0]);
 	    try {
@@ -575,25 +575,18 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
-			}}
+				}
+	    System.out.println("\tDas Fahrzeug hat insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
+	    }
 	    catch (Exception e) {
-	    	System.out.println("Fahrzeug hat kein Med500 abgeliefert.");
+	    	System.out.println("\tFahrzeug hat kein Med500 abgeliefert.");
 	    }
 
-	    
-		System.out.println("Standort A benötigt "+bedarfA.size()+" weitere Medikamente");
-		System.out.println("Standort B benötigt "+bedarfB.size()+" weitere Medikamente");
-		System.out.println("Standort C benötigt "+bedarfC.size()+" weitere Medikamente");
-		System.out.println("Standort D benötigt "+bedarfD.size()+" weitere Medikamente");
-		System.out.println("Standort E benötigt "+bedarfE.size()+" weitere Medikamente");
-		System.out.println("Standort F benötigt "+bedarfF.size()+" weitere Medikamente");
-		System.out.println("Standort G benötigt "+bedarfG.size()+" weitere Medikamente");
-		System.out.println("Standort H benötigt "+bedarfH.size()+" weitere Medikamente");
+
 		int gesamtBedarf = bedarfA.size()+bedarfB.size()+bedarfC.size()+bedarfD.size()+bedarfE.size()+bedarfF.size()+bedarfG.size()+bedarfH.size();
-		System.out.println("Insgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
+		System.out.println("\n\tInsgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
 		
-		System.out.println("Das Fahrzeug kehrt um "+endzeit+" in das Depot zurück." );
+		System.out.println("\tDas Fahrzeug kehrt um "+endzeit+" in das Depot zurück." );
 		fahrzeug.setRückkehrZeit(endzeit.getNewInstance());
 		zeitkostenFahrt = zeitkostenFahrt + Time.getDifferenceInMinutes
 			(endzeit,fahrzeug.getStartzeitFahrt())*kostenProStundeFahrt;
@@ -633,8 +626,8 @@ public class Tourenplaner {
 	    		if (e.getRückkehrZeit()!=null) {
 	    			if (zeitpunktAktuell.isLaterThan(e.getRückkehrZeit())) {
 	    				fahrzeug = new Fahrzeug();
-	    				System.out.println("Altes Fahrzeug startet");
-	    			    fahrzeug.setStrecke(strecke);
+	    				fahrzeug.setStrecke(strecke);
+	    				System.out.println("Altes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    			    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance());
 	    			}
 	    		}
@@ -642,14 +635,14 @@ public class Tourenplaner {
 	    } else {
 	    fahrzeug = new Fahrzeug();
 	    genutzteFahrzeuge = genutzteFahrzeuge +1;
-		System.out.println("Neues Fahrzeug startet");
 	    fahrzeug.setStrecke(strecke);
+		System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); }
 	    if (fahrzeug==null) {
 	    	fahrzeug = new Fahrzeug();
-		    genutzteFahrzeuge = genutzteFahrzeuge +1;
-			System.out.println("Neues Fahrzeug startet");
+		    genutzteFahrzeuge = genutzteFahrzeuge +1;		    
 		    fahrzeug.setStrecke(strecke);
+			System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 		    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); 
 	    }
 		
@@ -893,23 +886,14 @@ public class Tourenplaner {
 				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
 			}}
 	    catch (Exception e) {
-	    	System.out.println("Fahrzeug hat kein Med500 abgeliefert.");
+	    	System.out.println("\tFahrzeug hat kein Med500 abgeliefert.");
 	    }
 	    }
 
-	    
-		System.out.println("Bedarf A benötigt "+bedarfA.size()+" weitere Medikamente");
-		System.out.println("Bedarf B benötigt "+bedarfB.size()+" weitere Medikamente");
-		System.out.println("Bedarf C benötigt "+bedarfC.size()+" weitere Medikamente");
-		System.out.println("Bedarf D benötigt "+bedarfD.size()+" weitere Medikamente");
-		System.out.println("Bedarf E benötigt "+bedarfE.size()+" weitere Medikamente");
-		System.out.println("Bedarf F benötigt "+bedarfF.size()+" weitere Medikamente");
-		System.out.println("Bedarf G benötigt "+bedarfG.size()+" weitere Medikamente");
-		System.out.println("Bedarf H benötigt "+bedarfH.size()+" weitere Medikamente");
 		gesamtBedarf = bedarfA.size()+bedarfB.size()+bedarfC.size()+bedarfD.size()+bedarfE.size()+bedarfF.size()+bedarfG.size()+bedarfH.size();
-		System.out.println("Insgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
+		System.out.println("\n\tInsgesamt werden noch "+gesamtBedarf+" Einheiten benötigt.");
 		
-		System.out.println("Das Fahrzeug kehrt um "+endzeit+" in das Depot zurück." );
+		System.out.println("\tDas Fahrzeug kehrt um "+endzeit+" in das Depot zurück." );
 		fahrzeug.setRückkehrZeit(endzeit.getNewInstance());
 		zeitkostenFahrt = zeitkostenFahrt + Time.getDifferenceInMinutes
 			(endzeit,fahrzeug.getStartzeitFahrt())*kostenProStundeFahrt;
@@ -926,6 +910,7 @@ public class Tourenplaner {
 	public int getStreckenkostenFahrt() {
 		return streckenkostenFahrt;
 	}
+	
 
 	public int getZeitkostenFahrt() {
 		return zeitkostenFahrt;
@@ -957,7 +942,6 @@ public class Tourenplaner {
 	    for (int i = index; i<list.length;i++) {
 	    	strecke = strecke +list[i]+",";
 	    }
-	    System.out.println(strecke);
 	    
 		return this.neuesFahrzeugSchicken(strecke, überschuss);
 	}
