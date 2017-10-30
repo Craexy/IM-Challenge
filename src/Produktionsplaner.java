@@ -1,12 +1,7 @@
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+
 
 public class Produktionsplaner {
 	private int strafkosten;
@@ -42,7 +37,7 @@ public class Produktionsplaner {
 	public void planeProduktion(){
 		getNecessaryParameters();
 		assignProductionLines();
-		isItWorthIt();
+		//isItWorthIt();
 	}
 	
 	public void getNecessaryParameters(){
@@ -102,20 +97,6 @@ public class Produktionsplaner {
 			produktionsstart.add(spMed500);
 			
 			
-			System.out.println("\n");
-			System.out.println("Produktionsanfrage Fahrzeug "+(i+1)+"\n");
-			
-			System.out.println("Startzeit der Produktion von Med60: "+spMed60.toString());
-			//startzeitenProduktion.add(spMed120);
-			System.out.println("Startzeit der Produktion von Med120: "+spMed120.toString());
-			//startzeitenProduktion.add(spMed250);
-			System.out.println("Startzeit der Produktion von Med250: "+spMed250.toString());
-			//startzeitenProduktion.add(spMed500);
-			System.out.println("Startzeit der Produktion von Med500: "+spMed500.toString());
-			
-			System.out.println("\n");
-			
-			
 			//Übergeordnetete Datenstruktur zum Zugriff auf alle Fahrzeuge
 			fahrzeugBedarfe.add(bedarfe);
 			fahrzeugProduzierteMengen.add(produzierteMengen);
@@ -130,7 +111,7 @@ public class Produktionsplaner {
 		int anzahlDerProduktionslinien = 4; //Hier ist die Anzahl der Produktionslinien anpassbar
 		
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
-			produktionslinien.put(i,new Produktionslinie(this,i));
+			produktionslinien.put(i,new Produktionslinie(i));
 		}
 		
 		for(int k=0;k<fahrzeuge.size();k++){
@@ -149,9 +130,7 @@ public class Produktionsplaner {
 				//swap();
 				
 				if(!nochZuProduzieren.isEmpty()){
-					//vor transform teilmengen versuchen reinzulegen
-					//transform auf alle bereits belegten Produktionslinien anwenden, nicht nur auf momentan betrachtete (d.h. id übergeben und in transform() dann for i=0;i<=id;i++... und dann transformieren versuchen
-									
+								
 					System.out.println("Es wird eine weitere Produktionslinie benötigt!");
 					id++;
 				}
@@ -165,11 +144,8 @@ public class Produktionsplaner {
 				System.out.println("Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
 			}
 			
-				//Nicht produzierbare Restaufträge stehen in reste -> in kleinere mögliche produktionmenge umwandeln transformMeds() -> neu assignen sonst neue produktionslinie
-				//p1.transform meds
-			
 		}
-		System.out.println("Attempt transformation to save a production line.");
+		System.out.println("\nVersuch Produktionslinien durch Umwandlung und Umlagerung der Medikamente einzusparen.");
 		transform();
 		
 		//Die MedUeberschuss-Objekte instanziieren
@@ -222,8 +198,7 @@ public class Produktionsplaner {
 //		
 //	}
 	
-	//nach transform testweise verschieben und gucken wieviel die letzte PL jeweils Produziert und auf basis davon entscheiden ob Strafkosten in kauf genommen werden
-	public void transform(){ //Betrachtet bis jetzt nur transformierung in eine Richtung (60->120 etc.) //Kofnlikte innerhalb der TransformedMed-Objekte beachten
+	public void transform(){ //Kofnlikte innerhalb der TransformedMed-Objekte beachten
 		int numberOfProdLines = numberOfActiveProductionLines();
 		
 		for(int i=numberOfProdLines;i>1;i--){	//Die letzte genutzte PL wird betrachtet | es muss mehr als eine PL geben um die Produktionen auf die vorherige zu schieben
@@ -234,7 +209,7 @@ public class Produktionsplaner {
 			Map<Time,Integer> belegtMitMenge = zumUmverteilen.getBelegtMitMenge();
 			Map<Time,Integer> belegtMitMed = zumUmverteilen.getBelegtMitMed();
 			Map<Time,Integer> urspruenglicheBedarfe = zumUmverteilen.getUrspruenglicheBedarfe();
-			boolean allSuccessfull=false;
+			boolean allSuccessfull=true;
 			
 			LinkedList<TransformedMed> transformedMedObjects = new LinkedList<TransformedMed>();
 			
@@ -508,12 +483,12 @@ public class Produktionsplaner {
 				if(!successfull){
 					allSuccessfull=false;
 					break;
-				}	
+				}
 
 			}
-			System.out.println("Konnte die PL gespart werden?");
+			
 			if(allSuccessfull){
-				System.out.println("Ja");
+				System.out.println("\t-->Die Aufträge der Produktionslinie "+i+" konnten umgewandelt und umgelagert werden!");
 				
 				produktionslinien.get(numberOfProdLines).removeProduction(true,null, null, 0);
 				for(int z=0;z<transformedMedObjects.size();z++){
@@ -522,7 +497,7 @@ public class Produktionsplaner {
 				}
 				
 			}else{
-				System.out.println("Nein");
+				System.out.println("Umwandlungen und Umlagerungen sind nicht weiter möglich.");
 			}
 		}
 	

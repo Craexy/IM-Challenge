@@ -39,7 +39,6 @@ public class MedUeberschuss {
 			break;
 		}
 		
-		System.out.println("Dieser MedUeberschuss wurde erzeugt: "+medTyp+"  "+anzahlMeds+"   "+this.startProduktion);
 	}
 	
 	public MedUeberschuss getNewInstance() {

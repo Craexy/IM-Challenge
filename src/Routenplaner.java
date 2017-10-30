@@ -41,8 +41,7 @@ public class Routenplaner {
 	
 	private void planeRoute() {
 		simmulatedAnnealing();
-		System.out.println(tourLaenge);
-		System.out.println(this.best);
+		System.out.println("Optimale Route wurde wir folgt berechnet: "+this.best+ " Die Tourlänge beträgt "+tourLaenge+" Meilen");
 	}
 	
 	public static int getFahrtzeit(String Anfangspunkt, String Endpunkt) {

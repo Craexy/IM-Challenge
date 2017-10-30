@@ -4,7 +4,6 @@ import java.util.Map;
 
 public class Produktionslinie {
 	private int id;
-	private Produktionsplaner prodp;
 	
 	private LinkedList <Time> belegtvon;
 	private LinkedList <Time> belegtbis;
@@ -16,9 +15,8 @@ public class Produktionslinie {
 	HashMap<Time, LinkedList<Integer>> ueberschuesse; //LinkedList(0)=medTyp;LinkedList(1)=ueberschuss für die Produktion zu einem best. Zeitpunkt (->Key)
 	
 
-	public Produktionslinie(Produktionsplaner prodp, int id){
+	public Produktionslinie(int id){
 		this.id = id;
-		this.prodp = prodp;
 		
 		belegtvon = new LinkedList<Time>();
 		belegtbis = new LinkedList<Time>();
@@ -32,28 +30,16 @@ public class Produktionslinie {
 	}
 
 	public LinkedList<Integer> assign(LinkedList<Time> produktionsstart,LinkedList<Time> produktionsende, LinkedList<Integer> produktionsmenge, LinkedList<Integer> bedarfe){
-		//In dieser Funktion schon Umwandeln von 60 in 120 oder ähnliches, um alle zu produzieren.
-		//wenn die Ladung nicht komplett produziert werden kann -> neue Produktionslinie -> Übergabe der Medikamente die diese produktionslinie nicht produzieren konnte
 		
 		LinkedList<Integer> indizes = getIndexMaximaleProduktionsmenge(produktionsmenge);
-		for(int i=0;i<produktionsmenge.size();i++){
-			//ueberschuesse.add(0);
-		}
 		
 		try{
-			//belegtvon und belegtbis sortieren und dann prüfen ob produktionsstart earlierthan belegtbis einträge
-			//produktionsstart
-			//statt index indizes.getFirst benutzen und die returnwerte ändern
 			if(indizes!=null){
 				int durchlauf = indizes.size();
-				//For-schleife um alles mit indizes.size()
 				for(int c=0;c<durchlauf;c++){
 					
 					if(belegtvon.size()==0){
-							//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
-							//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
-							//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
-							
+						
 							belegtvon.add(produktionsstart.get(indizes.getFirst()));
 							belegtbis.add(produktionsende.get(indizes.getFirst()));
 							
@@ -62,24 +48,19 @@ public class Produktionslinie {
 							
 							urspruenglicheBedarfe.put(produktionsstart.get(indizes.getFirst()), bedarfe.get(indizes.getFirst()));
 							
+							addUeberschuesse(bedarfe.get(indizes.getFirst()),0);
+							
 							System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
 
-							addUeberschuesse(bedarfe.get(indizes.getFirst()),0);
 							
 							indizes.removeFirst();
 						
 					}else{
-						//Hier wenn schon aufträge vorhanden sind -> passt alles oder muss angepasst werden?
-						System.out.println("Es gibt eine Belegung der Produktionslinie, passen noch weitere?");
 						if(indizes!=null){
-							//Hier noch testen ob maximale kapazität mit dem einen Auftrag schon überschritten wird
-							//also wieviele 60er,120er... überhaupt roduziert werden können (switch-anweisung)
-							//produktionsdauer mit an diese Methode übergeben und dann hochrechnen
 							
 							//Testen ob zeitliche Überlappung vorliegt
 							int check = checkForConflicts(produktionsstart.get(indizes.getFirst()),produktionsende.get(indizes.getFirst()));
 							if(check!=-1){
-								System.out.println("Ja");
 								//Sortiert einfügen
 								belegtvon.add(check, produktionsstart.get(indizes.getFirst()));
 								belegtbis.add(check, produktionsende.get(indizes.getFirst()));
@@ -91,12 +72,11 @@ public class Produktionslinie {
 								
 								addUeberschuesse(bedarfe.get(indizes.getFirst()),check);
 								
+								System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
+
 								indizes.removeFirst();
 								
-								System.out.println(belegtvon);
-								System.out.println(belegtbis);
 							}else{
-								System.out.println("Nein");
 								indizes.offer(indizes.poll()); //Das Element an erster Stelle passt nicht, daher wird es übersprungen indem es
 															   //an die letzte Stelle der Prioritätsliste "indizes" gesetzt wird
 							}
@@ -182,13 +162,11 @@ public class Produktionslinie {
 		ueberschuesseList.set(med, ueberschuesse);
 		this.ueberschuesse.put(startZeitpunkt, ueberschuesseList);
 
-		System.out.println("Die Produktion wurde zugefügt");
 	}
 	
 	public void removeProduction(boolean all,Time startZeitpunkt, Time endZeitpunkt,int ueberschuesse){
 		if(all==true){
 			removeAllProductions();
-			System.out.println("Alle Produktionen wurden entfernt");
 		}else{
 
 			belegtvon.remove(startZeitpunkt);

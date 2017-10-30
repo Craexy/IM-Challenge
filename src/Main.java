@@ -7,7 +7,7 @@ public class Main {
 	public static void main(String[] args) {
 	int strafkostensatz = 100;
 		
-	Tourenplaner tourp = new Tourenplaner();
+	Tourenplaner tourp = new Tourenplaner(strafkostensatz,2);
 	LinkedList<Fahrzeug> fahrzeuge = tourp.getFahrzeuge();
 	
 	Produktionsplaner produktp = new Produktionsplaner(fahrzeuge, strafkostensatz);
