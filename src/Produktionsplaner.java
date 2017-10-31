@@ -113,10 +113,10 @@ public class Produktionsplaner {
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
 			produktionslinien.put(i,new Produktionslinie(i));
 		}
+		System.out.println("\n///// Zuweisung der Bedarfe der Fahrzeuge an die Produktionslinien /////");
 		
 		for(int k=0;k<fahrzeuge.size();k++){
-			System.out.println("");
-			System.out.println("/////// "+"Fahrzeug "+(k+1)+" ////////");
+			System.out.println("\nFahrzeug "+(k+1));
 			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
 			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
 			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
@@ -130,7 +130,7 @@ public class Produktionsplaner {
 				
 				if(!nochZuProduzieren.isEmpty()){
 								
-					System.out.println("Es wird eine weitere Produktionslinie benötigt!");
+					System.out.println("--> Es wird eine weitere Produktionslinie benötigt!\n");
 					id++;
 				}
 			}
@@ -138,14 +138,17 @@ public class Produktionsplaner {
 			
 			
 			if(!nochZuProduzieren.isEmpty()){
-				System.out.println("Alle Produktionslinien sind zu den angefragten Zeitpunkten bereits belegt, die Anfrage des Fahrzeuges "+(k+1)+" konnte nicht -oder nicht vollständig- produziert werden");
+				System.out.println("--> Alle Produktionslinien sind zu den angefragten Zeitpunkten bereits belegt, die Anfrage des Fahrzeuges "+(k+1)+" konnte nicht -oder nicht vollständig- produziert werden");
 			}else{
 				System.out.println("--> Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
 			}
 			
 		}
-		System.out.println("\nVersuch Produktionslinien durch Umwandlung und Umlagerung der Medikamente einzusparen.");
-		transform();
+		if(numberOfActiveProductionLines()>1){
+			System.out.println("\nVersuch Produktionslinien durch Umwandlung und Umlagerung der Medikamente einzusparen...");
+			transform();
+		}
+		
 		
 		//Die MedUeberschuss-Objekte instanziieren
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
@@ -197,10 +200,10 @@ public class Produktionsplaner {
 //		
 //	}
 	
-	public void transform(){ //Kofnlikte innerhalb der TransformedMed-Objekte beachten
+	public void transform(){ //Konflikte innerhalb der TransformedMed-Objekte beachten
 		int numberOfProdLines = numberOfActiveProductionLines();
 		
-		for(int i=numberOfProdLines;i>1;i--){	//Die letzte genutzte PL wird betrachtet | es muss mehr als eine PL geben um die Produktionen auf die vorherige zu schieben
+		for(int i=numberOfProdLines;i>1;i--){	//Die letzte genutzte PL wird betrachtet | es muss mehr als eine PL geben um die PL-Belegungens auf die vorherige zu schieben
 			
 			Produktionslinie zumUmverteilen = produktionslinien.get(numberOfProdLines);
 			LinkedList<Time> belegtvon = zumUmverteilen.getBelegtvon();
@@ -349,7 +352,7 @@ public class Produktionsplaner {
 						
 						break;
 						
-				case 2: //Umwandlung zu 60er //addTime anpassen //reduceTime zu addtime ändern
+				case 2: //Umwandlung zu 60er
 						medTypAktuell=0;
 						mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/150)*150);
 						ueberschuesseAktuell = mengeAktuell - urspruenglicheBedarfe.get(belegtvon.get(k));
@@ -412,7 +415,7 @@ public class Produktionsplaner {
 						
 						break;
 					
-				case 3:	 //Umwandlung zu 60er //addTime anpassen //reduceTime zu addtime ändern
+				case 3:	 //Umwandlung zu 60er
 						medTypAktuell=0;
 						mengeAktuell = ((int)Math.ceil((double)urspruenglicheBedarfe.get(belegtvon.get(k))/150)*150);
 						ueberschuesseAktuell = mengeAktuell - urspruenglicheBedarfe.get(belegtvon.get(k));
@@ -486,8 +489,8 @@ public class Produktionsplaner {
 
 			}
 			
-			if(allSuccessfull){
-				System.out.println("	-->Die Aufträge der Produktionslinie "+i+" konnten umgewandelt und vollständig umgelagert werden!");
+			if(allSuccessfull && !transformedMedObjects.isEmpty()){
+				System.out.println("-->Die Aufträge der Produktionslinie "+i+" konnten umgewandelt und vollständig umgelagert werden!");
 				
 				produktionslinien.get(numberOfProdLines).removeProduction(true,null, null, 0);
 				for(int z=0;z<transformedMedObjects.size();z++){
