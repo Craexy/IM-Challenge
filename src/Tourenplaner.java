@@ -249,7 +249,7 @@ public class Tourenplaner {
 		
 		//Standort, an dem die meisten Bedarfe durch Überschuss gedeckt werden können wird ermittelt
 		//Dieser wird zuerst angefahren
-		System.out.println("\nÜberschuss wird geprüft.");
+		System.out.println("\n|| Überschuss wird geprüft. ||");
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
