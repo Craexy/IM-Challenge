@@ -194,6 +194,7 @@ public class Tourenplaner {
 	
 	//Array von Überschüssen wird einzeln verteilt
 	public void verteileReste(MedUeberschuss[] überschüsse) {
+		System.out.println("\n|| Überschuss werden geprüft. ||");
 		for (int i=0;i<überschüsse.length;i++) {
 			this.verteileReste(überschüsse[i]);
 		}
@@ -249,7 +250,6 @@ public class Tourenplaner {
 		
 		//Standort, an dem die meisten Bedarfe durch Überschuss gedeckt werden können wird ermittelt
 		//Dieser wird zuerst angefahren
-		System.out.println("\n|| Überschuss wird geprüft. ||");
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
@@ -260,7 +260,7 @@ public class Tourenplaner {
 		
 		//Wenn an keinem Standort Bedarfe gedeckt werden können wird kein neues Fahrzeug losgeschickt
 		if (anzufahrenderOrt.equals("")) {
-			System.out.println("\tKeine Bedarfe abdeckbar");
+			System.out.println("\n\tKeine Bedarfe abdeckbar");
 			return;
 		}
 		System.out.println("\tOrt "+anzufahrenderOrt+" wird zuerst angefahren.");
