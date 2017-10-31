@@ -24,7 +24,7 @@ public class Main {
 		Tourenplaner tourp;
 		
 		for (int j=0; j<30;j++) {
-			System.out.println("\n------Start------");
+			System.out.println("\n\n------Start----------------------------------------------------------------------------------------------------------------------\n");
 			if (j%2==0) {tourp = new Tourenplaner(strafkostensatz, 1);}
 			else {tourp = new Tourenplaner(strafkostensatz, 2);}
 			LinkedList<Fahrzeug> fahrzeuge = tourp.getFahrzeuge();
