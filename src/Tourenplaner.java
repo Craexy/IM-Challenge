@@ -88,6 +88,8 @@ public class Tourenplaner {
 		
 		//Daten mit Uhrzeiten der Bedarfe werden eingelesen
 		this.befülleDaten();
+		
+		System.out.println("\n|| Verteilung der Medikamente an die Standorte ||\n");
 	   
 		//Variante 1
 		if (variante==1) {
@@ -100,6 +102,7 @@ public class Tourenplaner {
 			System.out.println("+++   Variante 2   +++");
 			this.befülleDaten();
 			this.variante2();}
+		
 
 	}
 	

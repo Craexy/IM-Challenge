@@ -88,7 +88,7 @@ public class Lösung {
 	}
 	
 	public String toString() {
-		return "\t--- Strafkostensatz: "+this.strafkostenSatz+" ---"+
+		return  "\t--- Strafkostensatz: "+this.strafkostenSatz+" ---"+
 				"\nInsgesamt wurden " + this.genutzteFahrzeuge + " Fahrzeuge verwendet."
 				+" Es wurden " + this.genutzteProduktionslinien + " Produktionslinien genutzt."
 				+" Es sind Gesamtkosten in Höhe von " + this.gesamtkosten + " entstanden."

@@ -113,7 +113,7 @@ public class Produktionsplaner {
 		for(int i=1;i<=anzahlDerProduktionslinien;i++){
 			produktionslinien.put(i,new Produktionslinie(i));
 		}
-		System.out.println("\n///// Zuweisung der Bedarfe der Fahrzeuge an die Produktionslinien /////");
+		System.out.println("\n\n|| Zuweisung der Bedarfe der Fahrzeuge an die Produktionslinien ||");
 		
 		for(int k=0;k<fahrzeuge.size();k++){
 			System.out.println("\nFahrzeug "+(k+1));

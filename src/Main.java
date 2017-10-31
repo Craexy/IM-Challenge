@@ -12,6 +12,7 @@ public class Main {
 		Lösung lösung2 = LösungErstellen(200);
 		Lösung lösung3 = LösungErstellen(3000);
 		
+		System.out.println("\n\n|| Ergebnisse ||");
 		System.out.println("\n"+lösung1);
 		System.out.println("\n"+lösung2);
 		System.out.println("\n"+lösung3);
