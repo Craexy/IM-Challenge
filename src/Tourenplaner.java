@@ -194,7 +194,7 @@ public class Tourenplaner {
 	
 	//Array von Überschüssen wird einzeln verteilt
 	public void verteileReste(MedUeberschuss[] überschüsse) {
-		System.out.println("\n|| Überschuss werden geprüft. ||");
+		System.out.println("\n\n|| Überschuss werden geprüft und verteilt ||");
 		for (int i=0;i<überschüsse.length;i++) {
 			this.verteileReste(überschüsse[i]);
 		}
