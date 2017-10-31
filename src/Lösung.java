@@ -88,7 +88,8 @@ public class Lösung {
 	}
 	
 	public String toString() {
-		return "Insgesamt wurden " + this.genutzteFahrzeuge + " Fahrzeuge verwendet."
+		return "\t--- Strafkostensatz: "+this.strafkostenSatz+" ---"+
+				"\nInsgesamt wurden " + this.genutzteFahrzeuge + " Fahrzeuge verwendet."
 				+" Es wurden " + this.genutzteProduktionslinien + " Produktionslinien genutzt."
 				+" Es sind Gesamtkosten in Höhe von " + this.gesamtkosten + " entstanden."
 				+"\nDiese entfallen auf Produktionskosten(" + this.produktionskosten+") und Distributionskosten für Strecke("

@@ -8,9 +8,9 @@ public class Main {
 	
 	//drei verschiedene Strafkostensätze --> drei Lösungsobjekte 
 	//alle drei am Ende ausgeben
-		Lösung lösung1 = LösungErstellen(50);
-		Lösung lösung2 = LösungErstellen(150);
-		Lösung lösung3 = LösungErstellen(200);
+		Lösung lösung1 = LösungErstellen(100);
+		Lösung lösung2 = LösungErstellen(200);
+		Lösung lösung3 = LösungErstellen(3000);
 		
 		System.out.println("\n"+lösung1);
 		System.out.println("\n"+lösung2);
@@ -23,7 +23,8 @@ public class Main {
 		Lösung finaleLösung = null;
 		Tourenplaner tourp;
 		
-		for (int j=0; j<30;j++) {
+		for (int j=0; j<100
+				;j++) {
 			System.out.println("\n------Start------");
 			if (j%2==0) {tourp = new Tourenplaner(strafkostensatz, 1);}
 			else {tourp = new Tourenplaner(strafkostensatz, 2);}

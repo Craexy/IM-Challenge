@@ -246,7 +246,7 @@ public class Tourenplaner {
 		
 		//Standort, an dem die meisten Bedarfe durch Überschuss gedeckt werden können wird ermittelt
 		//Dieser wird zuerst angefahren
-		System.out.println("Überschuss wird geprüft.");
+		System.out.println("\nÜberschuss wird geprüft.");
 		int lokalDeckbareBedarfe=0;
 		String anzufahrenderOrt ="";
 		for (Entry<String, Integer> e : deckbareBedarfe.entrySet()){
@@ -257,7 +257,7 @@ public class Tourenplaner {
 		
 		//Wenn an keinem Standort Bedarfe gedeckt werden können wird kein neues Fahrzeug losgeschickt
 		if (anzufahrenderOrt.equals("")) {
-			System.out.println("\n\tKeine Bedarfe abdeckbar");
+			System.out.println("\tKeine Bedarfe abdeckbar");
 			return;
 		}
 		System.out.println("\tOrt "+anzufahrenderOrt+" wird zuerst angefahren.");
@@ -273,6 +273,7 @@ public class Tourenplaner {
 		//Wenn Strafkosten geringer: Bedarf wiederherstellen und Fahrzeug löschen
 		//Wenn Strafkosten höher: Fahrzeugen zu Fahrzeugen hinzufügen
 		
+	
 		String[] buchstaben = new String[8];
 		buchstaben = "A,B,C,D,E,F,G,H".split(",");
 		
@@ -297,7 +298,7 @@ public class Tourenplaner {
 			} 
 		}
 		catch (NullPointerException e) {
-			System.out.println("Bedarf "+buchstaben[i]+" bereits gedeckt.");
+			System.out.println("\tBedarf "+buchstaben[i]+" bereits gedeckt.");
 			}
 		}
 		
@@ -336,7 +337,7 @@ public class Tourenplaner {
 	    			if (zeitpunktAktuell.isLaterThan(e.getRückkehrZeit())) {
 	    				fahrzeug = new Fahrzeug();
 	    				fahrzeug.setStrecke(strecke);
-	    				System.out.println("Altes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
+	    				System.out.println("\nAltes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    			    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance());
 	    			}
 	    		}
@@ -346,13 +347,13 @@ public class Tourenplaner {
 	    fahrzeug = new Fahrzeug();
 	    genutzteFahrzeuge = genutzteFahrzeuge +1;
 	    fahrzeug.setStrecke(strecke);
-	    System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
+	    System.out.println("\nNeues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); }
 	    if (fahrzeug==null) {
 	    	fahrzeug = new Fahrzeug();
 		    genutzteFahrzeuge = genutzteFahrzeuge +1;
 		    fahrzeug.setStrecke(strecke);
-			System.out.println("Neues Fahrzeug startet auf der Strecke "+fahrzeug.getStrecke());
+			System.out.println("\nNeues Fahrzeug startet auf der Strecke "+fahrzeug.getStrecke());
 		    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); 
 	    }
 
@@ -629,7 +630,7 @@ public class Tourenplaner {
 	    			if (zeitpunktAktuell.isLaterThan(e.getRückkehrZeit())) {
 	    				fahrzeug = new Fahrzeug();
 	    				fahrzeug.setStrecke(strecke);
-	    				System.out.println("Altes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
+	    				System.out.println("\nAltes Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    			    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance());
 	    			}
 	    		}
@@ -638,13 +639,13 @@ public class Tourenplaner {
 	    fahrzeug = new Fahrzeug();
 	    genutzteFahrzeuge = genutzteFahrzeuge +1;
 	    fahrzeug.setStrecke(strecke);
-		System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
+		System.out.println("\nNeues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 	    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); }
 	    if (fahrzeug==null) {
 	    	fahrzeug = new Fahrzeug();
 		    genutzteFahrzeuge = genutzteFahrzeuge +1;		    
 		    fahrzeug.setStrecke(strecke);
-			System.out.println("Neues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
+			System.out.println("\nNeues Fahrzeug startet auf der Strecke: "+fahrzeug.getStrecke());
 		    fahrzeug.setStartzeitFahrt(zeitpunktAktuell.getNewInstance()); 
 	    }
 		
@@ -715,7 +716,7 @@ public class Tourenplaner {
 					endzeit = zeitpunktAktuell.getNewInstance().addTime(Routenplaner.getFahrtzeit(aktuellerStopp, "A"));
 				}
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get60()+" Einheiten von Med60 abgeliefert.");
+				System.out.println("\tDas Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get60()+" Einheiten von Med60 abgeliefert.");
 			}
 	    }
 	    
@@ -775,7 +776,7 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
+				System.out.println("\tDas Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get120()+" Einheiten von Med120 abgeliefert.");
 			}
 	    }
 	    
@@ -833,7 +834,7 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get250()+" Einheiten von Med250 abgeliefert.");
+				System.out.println("\tDas Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get250()+" Einheiten von Med250 abgeliefert.");
 			}
 	    }
 	    
@@ -885,7 +886,7 @@ public class Tourenplaner {
 				aktuellerBedarf.addAll(frühBedarf);
 				aktuellerBedarf.sort(null);
 				
-				System.out.println("Das Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
+				System.out.println("\tDas Fahrzeug hat nach Stopp "+aktuellerStopp+" insgesamt "+fahrzeug.get500()+" Einheiten von Med500 abgeliefert.");
 			}}
 	    catch (Exception e) {
 	    	System.out.println("\tFahrzeug hat kein Med500 abgeliefert.");
@@ -930,16 +931,17 @@ public class Tourenplaner {
 		return route;
 	}
 
-	//private Fahrzeug resteFahrzeugSchicken(String Stopp, MedUeberschuss überschuss) {
 	private Object[] resteFahrzeugSchicken(String Stopp, MedUeberschuss überschuss) {	
 	String[] list = routenplaner.getRoute().split(",");		
 		int index = -1;
-	    for (int i = 0; (i < list.length) && (index == -1); i++) {
+	    //Es wird geprüft, an welcher Stelle der optimalen Route der Stopp ist, der übergeben wurde
+		for (int i = 0; (i < list.length) && (index == -1); i++) {
 	        if (list[i].equals(Stopp)) {
 	            index = i;
 	        }
 	    }
 	    
+		//Ausgehend vom übergebenen Stopp wird die Strecke abgefahren
 	    String strecke = "";
 	    for (int i = index; i<list.length;i++) {
 	    	strecke = strecke +list[i]+",";
