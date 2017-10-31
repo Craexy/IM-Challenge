@@ -200,7 +200,7 @@ public class Produktionslinie {
 	public LinkedList<Integer> getIndexMaximaleProduktionsmenge(LinkedList<Integer> produktionsmenge){
 		int max=0;
 		LinkedList <Integer> iMax = new LinkedList<Integer>();
-		System.out.println("\nZu Produzierende Mengen: "+produktionsmenge);
+		System.out.println("Zu Produzierende Mengen: "+produktionsmenge);
 		
 		for(int i=0;i<produktionsmenge.size();i++){
 			if(produktionsmenge.get(i)>max){
