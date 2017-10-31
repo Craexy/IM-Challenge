@@ -492,7 +492,7 @@ public class Produktionsplaner {
 				
 				produktionslinien.get(numberOfProdLines).removeProduction(true,null, null, 0);
 				for(int z=0;z<transformedMedObjects.size();z++){
-					TransformedMed tO = transformedMedObjects.get(i);
+					TransformedMed tO = transformedMedObjects.get(z);
 					produktionslinien.get(tO.getPL()).addProduction(tO.getPosition(), tO.getStartzeitpunkt(), tO.getEndzeitpunkt(), tO.getMenge(), tO.getMedTyp(), tO.getUeberschuesse(),tO.getUrspruenglicheBedarfe());
 				}
 				

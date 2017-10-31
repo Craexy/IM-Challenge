@@ -231,6 +231,7 @@ public class Tourenplaner {
 		for (Entry<String, LinkedList<Time>> e : bedarfe.entrySet()){
 			aktuellerBedarf = (LinkedList<Time>)e.getValue();
 			//Deckbarer Bedarf in aktuell betrachtetem Standort
+			if (!aktuellerBedarf.isEmpty()) {
 			int lokalDeckbareBedarfe = 0;
 			for (int j=0;j<aktuellerBedarf.size();j++) {
 				if (aktuellerBedarf.get(j).isLaterThan(startNutzung.getNewInstance().reduceTime(1))
@@ -238,6 +239,7 @@ public class Tourenplaner {
 					lokalDeckbareBedarfe = lokalDeckbareBedarfe + 1;	
 				}
 			deckbareBedarfe.put(e.getKey(), lokalDeckbareBedarfe);
+				}
 			}
 			
 		}
