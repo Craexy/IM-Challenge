@@ -50,7 +50,7 @@ public class Produktionslinie {
 							
 							addUeberschuesse(bedarfe.get(indizes.getFirst()),0);
 							
-							System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
+							System.out.println("\tDie Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
 
 							
 							indizes.removeFirst();
@@ -72,7 +72,7 @@ public class Produktionslinie {
 								
 								addUeberschuesse(bedarfe.get(indizes.getFirst()),check);
 								
-								System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
+								System.out.println("\tDie Maschine "+this.id+" wurde von "+produktionsstart.get(indizes.getFirst())+" bis "+produktionsende.get(indizes.getFirst())+" mit "+produktionsmenge.get(indizes.getFirst())+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(indizes.getFirst())+" belegt!");
 
 								indizes.removeFirst();
 								
@@ -82,7 +82,6 @@ public class Produktionslinie {
 							}
 							
 							
-							//System.out.println("Die Maschine "+this.id+" wurde von "+produktionsstart.get(index)+" bis "+produktionsende.get(index)+" mit "+produktionsmenge.get(index)+" Einheiten des Medikamentes "+changeIndexToTypeOfMed(index)+" belegt!");
 							}else{
 							return null;
 						}
@@ -149,22 +148,26 @@ public class Produktionslinie {
 	}
 	
 	public void addProduction(int position, Time startZeitpunkt, Time endZeitpunkt,int menge,int med,int ueberschuesse,int urspruenglicheBedarfe){
+		//Fügt der Produktionslinie eine Belegung inklusive der Überschüsse hinzu
+		
 		belegtvon.add(position, startZeitpunkt);
-		belegtbis.add(position,endZeitpunkt);
+		belegtbis.add(position, endZeitpunkt);
 		
 		belegtMitMenge.put(startZeitpunkt,menge);
 		belegtMitMed.put(startZeitpunkt, med);
 		this.urspruenglicheBedarfe.put(startZeitpunkt, urspruenglicheBedarfe);
-		LinkedList<Integer> ueberschuesseList = new LinkedList<Integer>();
-		for(int i=0;i<4;i++){
-			ueberschuesseList.add(0);
-		}
-		ueberschuesseList.set(med, ueberschuesse);
-		this.ueberschuesse.put(startZeitpunkt, ueberschuesseList);
+		
+		LinkedList<Integer> tempDaten = new LinkedList<Integer>();
+		
+		tempDaten.clear();
+		tempDaten.add(med);
+		tempDaten.add(ueberschuesse);
+		this.ueberschuesse.put(startZeitpunkt, tempDaten);
 
 	}
 	
 	public void removeProduction(boolean all,Time startZeitpunkt, Time endZeitpunkt,int ueberschuesse){
+		//Löscht eine, oder alle Belegungen der Produktionslinie (siehe removeAllProductions())
 		if(all==true){
 			removeAllProductions();
 		}else{
@@ -176,13 +179,12 @@ public class Produktionslinie {
 			belegtMitMed.remove(startZeitpunkt);
 			urspruenglicheBedarfe.remove(startZeitpunkt);
 			this.ueberschuesse.remove(startZeitpunkt);
-			
-			System.out.println("Die Produktion wurde entfernt");
 		}
 		
 	}
 	
 	public void removeAllProductions(){
+		//Löscht alle Belegungen einer Produktionslinie
 		belegtvon.clear();
 		belegtbis.clear();
 		belegtMitMenge.clear();
@@ -198,7 +200,7 @@ public class Produktionslinie {
 	public LinkedList<Integer> getIndexMaximaleProduktionsmenge(LinkedList<Integer> produktionsmenge){
 		int max=0;
 		LinkedList <Integer> iMax = new LinkedList<Integer>();
-		System.out.println(produktionsmenge);
+		System.out.println("\nZu Produzierende Mengen: "+produktionsmenge);
 		
 		for(int i=0;i<produktionsmenge.size();i++){
 			if(produktionsmenge.get(i)>max){
@@ -225,12 +227,11 @@ public class Produktionslinie {
 					
 				}
 		}
-		
-			System.out.println(iMax); 
+			System.out.println("Die Reihenfolge der Belegung (Greedy-Prinzip): "+iMax);
 			return iMax;	
 	}
 	
-	//Vielleicht brauch ich noch die umgekehrte Version dieser Methode. Je nachdem was sih noch ergibt im code
+	//Für die Ausgabe in der Konsole; wandelt 0-3 in die Strings der jeweiligen Medikament-Typen um
 	public String changeIndexToTypeOfMed(int index){
 		String value="";
 		switch(index){
@@ -294,6 +295,7 @@ public class Produktionslinie {
 	}
 	
 	public int getKosten(){
+		//Gibt die variablen Kosten für die Produktionslinie zurück
 		int dauer =0;
 		for(int i=0;i<belegtvon.size();i++){
 			dauer += Time.getDifferenceInMinutes(belegtvon.get(i), belegtbis.get(i));

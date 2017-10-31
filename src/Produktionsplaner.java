@@ -117,7 +117,6 @@ public class Produktionsplaner {
 		for(int k=0;k<fahrzeuge.size();k++){
 			System.out.println("");
 			System.out.println("/////// "+"Fahrzeug "+(k+1)+" ////////");
-			System.out.println("");
 			LinkedList<Integer> bedarfe = fahrzeugBedarfe.get(k);
 			LinkedList<Time> produktionsstart = produktionsstartZeitpunkte.get(k);
 			LinkedList<Time> produktionsende = bedarfszeitpunkte.get(k);
@@ -141,7 +140,7 @@ public class Produktionsplaner {
 			if(!nochZuProduzieren.isEmpty()){
 				System.out.println("Alle Produktionslinien sind zu den angefragten Zeitpunkten bereits belegt, die Anfrage des Fahrzeuges "+(k+1)+" konnte nicht -oder nicht vollständig- produziert werden");
 			}else{
-				System.out.println("Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
+				System.out.println("--> Alle Produktionsanfragen des Fahrzeuges "+(k+1)+" wurden an die Produktionslinien verteilt!");	
 			}
 			
 		}
@@ -234,7 +233,7 @@ public class Produktionsplaner {
 						produktionsdauer = ((int)Math.ceil((double)mengeAktuell/100)*30);
 						startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 						
-						for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+						for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 							int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 							if(check!=-1){
 								transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -253,7 +252,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/80)*60);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell));
@@ -274,7 +273,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/60)*120);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -296,7 +295,7 @@ public class Produktionsplaner {
 						produktionsdauer = ((int)Math.ceil((double)mengeAktuell/150)*15);
 						startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 						
-						for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+						for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 							int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 							if(check!=-1){
 								transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -315,7 +314,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/80)*60);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -336,7 +335,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/60)*120);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -358,7 +357,7 @@ public class Produktionsplaner {
 						produktionsdauer = ((int)Math.ceil((double)mengeAktuell/150)*15);
 						startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 						
-						for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+						for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 							int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 							if(check!=-1){
 								transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell));
@@ -377,7 +376,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/100)*30);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell));
@@ -399,7 +398,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/60)*120);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -421,7 +420,7 @@ public class Produktionsplaner {
 						produktionsdauer = ((int)Math.ceil((double)mengeAktuell/150)*15);
 						startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 						
-						for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+						for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 							int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 							if(check!=-1){
 								transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell));
@@ -440,7 +439,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/100)*30);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell)); 
@@ -462,7 +461,7 @@ public class Produktionsplaner {
 							produktionsdauer = ((int)Math.ceil((double)mengeAktuell/80)*60);
 							startzeitAktuell = endzeitAktuell.getNewInstance().reduceTime(produktionsdauer);
 							
-							for(int j=1;j<(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
+							for(int j=1;j<=(numberOfProdLines-1);j++){ //Probieren der Belegung des transformierten Meds auf eine der vorhergehenden PL's
 								int check = produktionslinien.get(j).checkForConflicts(startzeitAktuell, endzeitAktuell );
 								if(check!=-1){
 									transformedMedObjects.add(new TransformedMed(j,check,medTypAktuell,mengeAktuell,startzeitAktuell,endzeitAktuell,ueberschuesseAktuell,urspruenglicheBedarfeAktuell));
@@ -488,11 +487,11 @@ public class Produktionsplaner {
 			}
 			
 			if(allSuccessfull){
-				System.out.println("\t-->Die Aufträge der Produktionslinie "+i+" konnten umgewandelt und umgelagert werden!");
+				System.out.println("	-->Die Aufträge der Produktionslinie "+i+" konnten umgewandelt und vollständig umgelagert werden!");
 				
 				produktionslinien.get(numberOfProdLines).removeProduction(true,null, null, 0);
 				for(int z=0;z<transformedMedObjects.size();z++){
-					TransformedMed tO = transformedMedObjects.get(i);
+					TransformedMed tO = transformedMedObjects.get(z);
 					produktionslinien.get(tO.getPL()).addProduction(tO.getPosition(), tO.getStartzeitpunkt(), tO.getEndzeitpunkt(), tO.getMenge(), tO.getMedTyp(), tO.getUeberschuesse(),tO.getUrspruenglicheBedarfe());
 				}
 				

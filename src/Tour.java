@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public class Tour {
 
-	private LinkedList tour = new LinkedList<String>();
+	private LinkedList<String> tour = new LinkedList<String>();
 	private int distance = 0;
 	
 	
@@ -15,12 +15,12 @@ public class Tour {
         }
     }
     
-    public Tour(LinkedList tour){
-        this.tour = (LinkedList) tour.clone();
+    public Tour(LinkedList<String> tour){
+        this.tour = (LinkedList<String>) tour.clone();
     }
     
  
-    public LinkedList getTour(){
+    public LinkedList<String> getTour(){
         return tour;
     }
     
@@ -44,7 +44,7 @@ public class Tour {
     
     public void setCity(int tourPosition, String city) {
         tour.set(tourPosition, city);
-        // If the tours been altered we need to reset the fitness and distance
+        // Bei neuer Tour wird die Distanz auf 0 um in getDistance die Teilstrecken aufzuaddieren
         distance = 0;
     }
     
@@ -57,21 +57,21 @@ public class Tour {
     	case 1:
     		if (distance == 0) {
                 int tourDistance = 0;
-                // Loop through our tour's cities
+                // For-Schleife über alle Städte in einer Tour
                 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
-                    // Get city we're traveling from
+                    // Teilroute: Startstadt
                     String fromCity = getCity(cityIndex);
-                    // City we're traveling to
+                    // Teilroute: Zielstadt
                     String destinationCity;
-                    // Check we're not on our tour's last city, if we are set our 
-                    // tour's final destination city to our starting city
+                    // Befindet sich der Algorithmus auf der letzten Stadt als Startstadt
+                    // wird die 1. Stadt als Zielstadt festgelegt (->Rundreise)
                     if(cityIndex+1 < tourSize()){
                         destinationCity = getCity(cityIndex+1);
                     }
                     else{
                         destinationCity = getCity(0);
                     }
-                    // Get the distance between the two cities
+                    // Addiert die Distanz der Teilstrecke zu der Gesamtlänge der Tour
                     tourDistance += Routenplaner.getFahrtzeit(fromCity,destinationCity);
                 }
                 distance = tourDistance;
@@ -81,21 +81,21 @@ public class Tour {
     	case 2:
     		if (distance == 0) {
                 int tourDistance = 0;
-                // Loop through our tour's cities
+                // For-Schleife über alle Städte in einer Tour
                 for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
-                    // Get city we're traveling from
+                	// Teilroute: Startstadt
                     String fromCity = getCity(cityIndex);
-                    // City we're traveling to
+                    // Teilroute: Zielstadt
                     String destinationCity;
-                    // Check we're not on our tour's last city, if we are set our 
-                    // tour's final destination city to our starting city
+                    // Befindet sich der Algorithmus auf der letzten Stadt als Startstadt
+                    // wird die 1. Stadt als Zielstadt festgelegt (->Rundreise)
                     if(cityIndex+1 < tourSize()){
                         destinationCity = getCity(cityIndex+1);
                     }
                     else{
                         destinationCity = getCity(0);
                     }
-                    // Get the distance between the two cities
+                    // Addiert die Distanz der Teilstrecke zu der Gesamtlänge der Tour
                     tourDistance += Routenplaner.getFahrstrecke(fromCity,destinationCity);
                 }
                 distance = tourDistance;

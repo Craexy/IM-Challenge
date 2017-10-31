@@ -79,51 +79,53 @@ public class Routenplaner {
 		//Wähle die Variante der Distanzfunktion: Zeit=1/Strecke=2
 		int variante = 1;
 		
-		// Set initial temp
+		// Systemtemperatur
         double temp = 10000;
 
-        // Cooling rate
+        // Abkühlungsrate
         double coolingRate = 0.003;
         
-     // Initialize intial solution
+     // Die erste Tour wird zufällig erstellt (Stadt "A" jedoch immer an erster Stelle)
         Tour currentSolution = new Tour();
         currentSolution.eineTourErstellen();
         
-     // Set as current best
+     // Zufällig erstellte Tour als bisher beste Tour festlegen
         Tour best = new Tour(currentSolution.getTour());
         
-     // Loop until system has cooled
+     // Solange ausführen bis Temperatur nicht mehr größer 1
         while (temp > 1) {
-            // Create new neighbour tour
+            // Erstelle eine neue Tour als Kopie der alten
             Tour newSolution = new Tour(currentSolution.getTour());
 
-            // Get two random positions in the tour
+            // Wähle zwei Positionen der Tour
             int tourPos1 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
             int tourPos2 = (int) ((newSolution.tourSize()-1) * Math.random()+1);
 
-            // Get the cities at selected positions in the tour
+            // Wähle die Städte zu den Positionen
             String citySwap1 = newSolution.getCity(tourPos1);
             String citySwap2 = newSolution.getCity(tourPos2);
 
-            // Swap them
+            // Tausche die Städte
             newSolution.setCity(tourPos2, citySwap1);
             newSolution.setCity(tourPos1, citySwap2);
             
-            // Get energy of solutions
+            // Berechne die Energie (-> Länge) der Touren
             int currentEnergy = currentSolution.getDistance(variante);
             int neighbourEnergy = newSolution.getDistance(variante);
 
-            // Decide if we should accept the neighbour
+            // Akzeptanzfunktion aufrufen
             if (acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) {
                 currentSolution = new Tour(newSolution.getTour());
             }
 
-            // Keep track of the best solution found
+            // Falls die neue Tour kürzer ist, wird sie als beste Tour gespeichert
+            // Dazu muss sie allerdings akzeptiert worden sein, 
+            // da sonst die currentSolution nicht der newSolution sondern der vorhergehenden Lösung entspricht
             if (currentSolution.getDistance(variante) < best.getDistance(variante)) {
                 best = new Tour(currentSolution.getTour());
             }
             
-            // Cool system
+            // System kühlt ab
             temp *= 1-coolingRate;
         }
         this.best = best.getTour();
@@ -131,13 +133,15 @@ public class Routenplaner {
 	}
 	
 
-	 // Berechne die acceptance probability
+	 // Berechne die Akzeptanzwahrscheinlichkeit
     public static double acceptanceProbability(int energy, int newEnergy, double temperature) {
-        // If the new solution is better, accept it (Energy = Gesamtdistanz der Route)
+    	// (Energy = Gesamtdistanz der Route)
+    	
+        // Wenn die neue Tour besser ist, wird sie akzeptiert (-> Akzeptanzwahrscheinlichkeit von 1,0 entspricht 100%)
         if (newEnergy < energy) {
             return 1.0;
         }
-        // If the new solution is worse, calculate an acceptance probability
+        // Wenn die neue Tour schlechter ist, wird eine Akzeptanzwahrscheinlichkeit zwischen 0 und 1 zurückgegeben
         return Math.exp((energy - newEnergy) / temperature);
     }
     
